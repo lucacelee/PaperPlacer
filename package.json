@@ -1,0 +1,23 @@
+{
+  "name": "paperplacer",
+  "version": "1.0.0",
+  "description": "Simple webapp to display catalogues of documents",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucacelee/PaperPlacer.git"
+  },
+  "author": "lucacelee",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/lucacelee/PaperPlacer/issues"
+  },
+  "homepage": "https://github.com/lucacelee/PaperPlacer#readme",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
