@@ -18,13 +18,15 @@ const pool = mariadb_1.default.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     trace: true // Development only!
 });
-function connect() {
+function setup() {
     return __awaiter(this, void 0, void 0, function* () {
         const conn = yield pool.getConnection();
         try {
-            yield conn.query("USE paperplacer;");
+            let table = yield pool.query("CREATE TABLE IF NOT EXISTS ppindex (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, section TINYTEXT CHARACTER SET utf8 NOT NULL);");
+            console.log(table);
         }
         finally {
             conn.end();
@@ -32,7 +34,7 @@ function connect() {
     });
 }
 try {
-    connect();
+    setup();
 }
 catch (error) {
     console.log("Failed to connect to MariaDB. Error:\n" + error);
