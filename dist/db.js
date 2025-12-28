@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.db = void 0;
 const mariadb_1 = __importDefault(require("mariadb"));
-require('dotenv').config();
+require("dotenv/config");
 class db {
     constructor() {
         this.pool = mariadb_1.default.createPool({
@@ -22,6 +22,7 @@ class db {
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
+            permitLocalInfile: true,
             trace: true // Development only!
         });
     }
@@ -33,8 +34,22 @@ class db {
                 console.log(table);
             }
             finally {
-                conn.end();
+                conn.release();
             }
+        });
+    }
+    importFile(filepath) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const conn = yield this.pool.getConnection();
+            console.log(`The path to the imported .csv is ${filepath}`);
+            let pathComponents = filepath.split('/');
+            let filename = pathComponents[pathComponents.length - 1];
+            let name = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
+            console.log(`The file name is ${name}`);
+            yield conn.query(`INSERT INTO ppindex SET section = '${name}'`);
+            yield conn.query(`CREATE TABLE IF NOT EXISTS ${name} (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, name VARCHAR(511) CHARACTER SET utf8mb4, mime TINYTEXT CHARACTER SET ascii, url VARCHAR(2048) CHARACTER SET ascii, transcript LONGTEXT CHARACTER SET utf8mb4, iscategory BOOLEAN NOT NULL DEFAULT FALSE, PRIMARY KEY (id));`);
+            yield conn.query(`LOAD DATA LOCAL INFILE '${filepath}' INTO TABLE ${name} (name, mime, url, transcript) SET iscategory = IF(mime = 'category', TRUE, FALSE)`);
+            conn.release();
         });
     }
 }
