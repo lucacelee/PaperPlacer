@@ -10,9 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("./db");
+const server_1 = require("./server");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     console.log("hey");
-    var maria = new db_1.db();
+    var maria = new db_1.db;
     try {
         yield maria.setup();
     }
@@ -20,11 +21,14 @@ const db_1 = require("./db");
         console.log("Failed to connect to MariaDB. Error:\n" + error);
     }
     try {
-        yield maria.importFile("/files/Temp2/test.csv");
+        // await maria.importFile("/files/Temp2/test.csv");
     }
     catch (error) {
         console.log("Failed to import the CSV. Error:\n" + error);
     }
 }))();
+var web = new server_1.webserver;
+web.respond();
+web.listen();
 // End
 //# sourceMappingURL=index.js.map

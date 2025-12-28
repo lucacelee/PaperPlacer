@@ -1,8 +1,9 @@
 import { db } from "./db";
+import { webserver } from "./server";
 
 (async () => {
   console.log("hey");
-  var maria = new db();
+  var maria = new db;
   try {
     await maria.setup();
   } catch (error) {
@@ -10,9 +11,13 @@ import { db } from "./db";
   }
 
   try {
-    await maria.importFile("/files/Temp2/test.csv");
+    // await maria.importFile("/files/Temp2/test.csv");
   } catch (error) {
     console.log("Failed to import the CSV. Error:\n" + error)
   }
 })();
+
+var web = new webserver;
+web.respond();
+web.listen();
 // End
