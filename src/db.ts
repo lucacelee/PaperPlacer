@@ -28,9 +28,10 @@ export class db {
         let filename:string = pathComponents[pathComponents.length-1];
         let name:string = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
         console.log(`The file name is ${name}`);
-        await conn.query(`INSERT INTO ppindex SET section = '${name}'`);
-        await conn.query(`CREATE TABLE IF NOT EXISTS ${name} (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, name VARCHAR(511) CHARACTER SET utf8mb4, mime TINYTEXT CHARACTER SET ascii, url VARCHAR(2048) CHARACTER SET ascii, transcript LONGTEXT CHARACTER SET utf8mb4, iscategory BOOLEAN NOT NULL DEFAULT FALSE, PRIMARY KEY (id));`);
-        await conn.query(`LOAD DATA LOCAL INFILE '${filepath}' INTO TABLE ${name} (name, mime, url, transcript) SET iscategory = IF(mime = 'category', TRUE, FALSE)`);
+        conn.query(`INSERT INTO ppindex SET section = '${name}'`);
+        await conn.query(`CREATE TABLE IF NOT EXISTS ${name} (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, name VARCHAR(511) CHARACTER SET utf8mb4, mime TINYTEXT CHARACTER SET ascii, url VARCHAR(2048) CHARACTER SET ascii, transcript LONGTEXT CHARACTER SET utf8mb4, iscategory BOOLEAN NOT NULL DEFAULT FALSE, PRIMARY KEY (id), UNIQUE KEY link (url));`);
+        await conn.query(`LOAD DATA LOCAL INFILE '${filepath}' INTO TABLE ${name} IGNORE 1 LINES (name, mime, url, transcript) SET iscategory = IF(mime = 'category', TRUE, FALSE)`);
+        await conn.query(`CREATE FULLTEXT INDEX transcript_index ON ${name} (transcript)`);
         conn.release();
     }
 }
