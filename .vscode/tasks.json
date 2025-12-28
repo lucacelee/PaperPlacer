@@ -8,11 +8,23 @@
 			"problemMatcher": [
 				"$tsc-watch"
 			],
+			"label": "tsc: watch - tsconfig.json"
+		},
+		{
+			"type": "shell",
+			"command": "npx cpx \"src/templates/**/*\" dist/templates --watch",
+			"label": "copy html: watch"
+		},
+		{
+			"dependsOn": [
+				"tsc: watch - tsconfig.json",
+				"copy html: watch"
+			],
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
-			"label": "tsc: watch - tsconfig.json"
+			"label": "development: watch"
 		}
 	]
 }
