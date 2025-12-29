@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { webserver } from "./server";
+import { serve } from "./server";
 
 (async () => {
   console.log("hey");
@@ -17,7 +17,5 @@ import { webserver } from "./server";
   }
 })();
 
-var web = new webserver;
-web.respond();
-web.listen();
+serve();
 // End

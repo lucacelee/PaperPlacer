@@ -27,8 +27,6 @@ const server_1 = require("./server");
         console.log("Failed to import the CSV. Error:\n" + error);
     }
 }))();
-var web = new server_1.webserver;
-web.respond();
-web.listen();
+(0, server_1.serve)();
 // End
 //# sourceMappingURL=index.js.map

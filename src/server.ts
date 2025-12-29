@@ -1,18 +1,13 @@
-import express from "express";
+import http, { IncomingMessage, ServerResponse } from "http";
 import { renderHtml } from "./render";
+import { loadStatic } from "./static";
 
-export class webserver {
-    server = express();
+export function serve () {
+    const server = http.createServer((request: IncomingMessage, response: ServerResponse) => {
+        if (loadStatic(request, response)) return;
 
-    respond () {
-        this.server.get('/', (request, response) => {
-        response.send(renderHtml("index.html"));
-        });
-    }
-
-    listen () {
-        this.server.listen(3000, () => {
-        console.log("The webserver is accessible at http://localhost:3000");
-        });
-    }
+        response.writeHead(200);
+        response.end(renderHtml("index.html"));
+    });
+    server.listen(3000);
 }
