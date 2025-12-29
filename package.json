@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "launch": "node dist/index.js",
-    "build": "tsc && cp -r src/templates dist/templates"
+    "build": "tsc && npx cpx \"src/templates/**/*\" dist/templates"
   },
   "repository": {
     "type": "git",
