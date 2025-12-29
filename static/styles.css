@@ -1,3 +1,47 @@
 body {
-    background-color: wheat;
+    background-image: url("wood2.jpg");
+    background-size: cover;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+main {
+    margin: auto;
+    width: 1000px;
+    border: 3px white;
+    color: brown;
+}
+
+header {
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+}
+
+.flex {
+    display: flex;
+    min-height: 40em;
+    flex-direction: row;
+}
+
+.sidebar_item {
+    color: white;
+}
+
+#main {
+    background-image: radial-gradient(ellipse at top, #ffeed6, #f8e7c4);
+    width: 100%;
+    border: thick double rgba(255, 255, 255, 0.8);
+    border-radius: 2rem;
+    margin: 0 1em;
+}
+
+#sidebar {
+    display: flex;
+    background-image: radial-gradient(#fbe6c9, #ecd7ab);
+    min-width: 18rem;
+    border: thick double rgba(255, 255, 255, 0.9);
+    border-radius: 2rem;
+    flex-direction: column;
 }
