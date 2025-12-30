@@ -1,5 +1,5 @@
 import http, { IncomingMessage, ServerResponse } from "http";
-import { writeFileSync, existsSync } from "fs";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
 import url from 'url';
 import { join } from "node:path";
 import { renderHtml } from "./render";
@@ -35,8 +35,10 @@ export function serve () {
                         const bufferFilename = metadata.toString("utf-8").match(filenameRegex);
                         const downloadName = (bufferFilename == null) ? "unnamed" : bufferFilename[1];
                         console.log(`\n The filename of the upload is ${downloadName}\n`)
-
-                        writeFileSync(join(__dirname, "../tmp", downloadName), content);
+                        
+                        const tmpDir = join(__dirname, "../tmp");
+                        if (!existsSync(tmpDir)) mkdirSync(tmpDir, {recursive: true});
+                        writeFileSync(join(tmpDir, downloadName), content);
 
                         response.end(await renderHtml("upload_successfull.html"));
                     });

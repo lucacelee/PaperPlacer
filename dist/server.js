@@ -35,7 +35,10 @@ function serve() {
                         const bufferFilename = metadata.toString("utf-8").match(filenameRegex);
                         const downloadName = (bufferFilename == null) ? "unnamed" : bufferFilename[1];
                         console.log(`\n The filename of the upload is ${downloadName}\n`);
-                        (0, fs_1.writeFileSync)((0, node_path_1.join)(__dirname, "../tmp", downloadName), content);
+                        const tmpDir = (0, node_path_1.join)(__dirname, "../tmp");
+                        if (!(0, fs_1.existsSync)(tmpDir))
+                            (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
+                        (0, fs_1.writeFileSync)((0, node_path_1.join)(tmpDir, downloadName), content);
                         response.end(await (0, render_1.renderHtml)("upload_successfull.html"));
                     });
                 }
