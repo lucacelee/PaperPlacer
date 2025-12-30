@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="52.916668mm"
+   height="66.145828mm"
+   viewBox="0 0 52.916668 66.145828"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="pdf.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="52.916668"
+       height="66.145828"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="SVGID_21_"
+       gradientUnits="userSpaceOnUse"
+       x1="968.98242"
+       y1="924.22412"
+       x2="968.98242"
+       y2="674.22412">
+				<stop
+   offset="0"
+   style="stop-color:#DCDDDE"
+   id="stop71" />
+
+				<stop
+   offset="0.199"
+   style="stop-color:#E3E4E5"
+   id="stop72" />
+
+				<stop
+   offset="0.6062"
+   style="stop-color:#EEEEEF"
+   id="stop73" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F1F2F2"
+   id="stop74" />
+
+			</linearGradient>
+    <linearGradient
+       id="SVGID_22_"
+       gradientUnits="userSpaceOnUse"
+       x1="968.98242"
+       y1="754.22412"
+       x2="968.98242"
+       y2="674.22412">
+				<stop
+   offset="0"
+   style="stop-color:#F49AC1"
+   id="stop75" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F8C1D9"
+   id="stop76" />
+
+			</linearGradient>
+  </defs>
+  <g
+     inkscape:label="Шар 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g78"
+       transform="matrix(0.26458333,0,0,0.26458333,-229.92291,-178.38208)">
+		<g
+   id="g77">
+			<linearGradient
+   id="linearGradient4"
+   gradientUnits="userSpaceOnUse"
+   x1="968.98242"
+   y1="924.22412"
+   x2="968.98242"
+   y2="674.22412">
+				<stop
+   offset="0"
+   style="stop-color:#DCDDDE"
+   id="stop1" />
+
+				<stop
+   offset="0.199"
+   style="stop-color:#E3E4E5"
+   id="stop2" />
+
+				<stop
+   offset="0.6062"
+   style="stop-color:#EEEEEF"
+   id="stop3" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F1F2F2"
+   id="stop4" />
+
+			</linearGradient>
+
+			<polygon
+   class="st30"
+   points="869,924.2 869,674.2 1009,674.2 1069,734.2 1069,924.2 "
+   id="polygon74"
+   style="fill:url(#SVGID_21_)" />
+
+			<linearGradient
+   id="linearGradient6"
+   gradientUnits="userSpaceOnUse"
+   x1="968.98242"
+   y1="754.22412"
+   x2="968.98242"
+   y2="674.22412">
+				<stop
+   offset="0"
+   style="stop-color:#F49AC1"
+   id="stop5" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F8C1D9"
+   id="stop6" />
+
+			</linearGradient>
+
+			<polygon
+   class="st31"
+   points="869,674.2 869,754.2 1069,754.2 1069,734.2 1009,674.2 "
+   id="polygon76"
+   style="fill:url(#SVGID_22_)" />
+
+			<polygon
+   class="st4"
+   points="1009,674.2 1009,734.2 1069,734.2 "
+   id="polygon77"
+   style="opacity:0.3;fill:#ffffff" />
+
+			<text
+   transform="translate(880.978,734.2246)"
+   class="st5 st6 st7 st8"
+   id="text77"
+   style="font-size:50px;font-family:Myriad-Bold;letter-spacing:2;fill:#ffffff">PNG</text>
+
+		</g>
+
+		<path
+   class="st2"
+   d="m 999.6,893.7 h 12.3 v -12.3 h -12.3 z m -24.5,0 h 12.3 v -12.3 h -12.3 z m 0,-61.3 v -12.3 h -12.3 v 12.3 z m -36.8,12.3 V 857 h 12.3 v -12.3 z m 98.1,0 v -12.3 h -12.3 v 12.3 z m 0,-24.5 v -12.3 h -12.3 v 12.3 z m 0,49 V 857 h -12.3 v 12.3 h 12.3 z m 0,24.5 v -12.3 h -12.3 v 12.3 z m -73.5,-49 V 857 h 12.3 v -12.3 z m -61.3,49 h 12.3 V 881.4 H 901.6 Z M 938.3,783.4 H 926 v 12.3 h 12.3 z m 24.6,0 h -12.3 v 12.3 h 12.3 z m 24.5,0 h -12.3 v 12.3 h 12.3 z M 901.6,857 v 12.3 h 12.3 V 857 Z m 0,-73.6 v 12.3 h 12.3 v -12.3 z m 0,49 v 12.3 h 12.3 v -12.3 z m 110.3,-49 h -12.3 v 12.3 h 12.3 z m -85.8,110.3 h 12.3 v -12.3 h -12.3 z m 49,-49 h 12.3 v -12.3 h -12.3 z m -24.5,-12.3 v 12.3 h 12.3 v -12.3 z m -49,-24.5 v 12.3 h 12.3 v -12.3 z m 49,85.8 h 12.3 v -12.3 h -12.3 z m 0,-73.5 h -12.3 v 12.3 h 12.3 z m -36.8,49 v 12.3 h 12.3 v -12.3 z m 12.3,-24.5 H 913.8 V 857 h 12.3 z m 12.2,24.5 v 12.3 h 12.3 v -12.3 z m -12.2,-49 h -12.3 v 12.3 h 12.3 z m 0,-24.5 H 913.8 V 808 h 12.3 z m 61.3,61.3 h 12.3 v -12.3 h -12.3 z m 24.5,24.5 h 12.3 v -12.3 h -12.3 z m 0,-85.8 V 808 h 12.3 v -12.3 z m 0,36.7 h 12.3 v -12.3 h -12.3 z m 24.5,-49 h -12.3 v 12.3 h 12.3 z m -24.5,73.6 h 12.3 v -12.3 h -12.3 z m -61.3,-49.1 v -12.3 h -12.3 v 12.3 z m 36.8,61.3 v 12.3 h 12.3 v -12.3 z m -24.5,0 v 12.3 h 12.3 v -12.3 z m 12.2,-61.3 v -12.3 h -12.3 v 12.3 z m -12.2,12.3 v -12.3 h -12.3 v 12.3 z m -24.6,12.2 H 926 v 12.3 h 12.3 z m 49.1,-12.2 v -12.3 h -12.3 v 12.3 z M 926.1,857 v 12.3 h 12.3 V 857 Z m 61.3,-24.6 h 12.3 V 820.1 H 987.4 Z M 938.3,807.9 H 926 v 12.3 h 12.3 z m 61.3,12.3 h 12.3 v -12.3 h -12.3 z m 0,-12.3 v -12.3 h -12.3 v 12.3 z m 0,36.8 h 12.3 v -12.3 h -12.3 z m 0,24.5 h 12.3 V 857 h -12.3 z m -49,-12.2 v 12.3 h 12.3 V 857 Z m 24.5,0 v 12.3 h 12.3 V 857 Z"
+   id="path77"
+   style="opacity:0.15" />
+
+	</g>
+  </g>
+</svg>

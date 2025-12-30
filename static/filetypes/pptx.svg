@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="52.916664mm"
+   height="66.145828mm"
+   viewBox="0 0 52.916664 66.145828"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="docx.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="52.916664"
+       height="66.145828"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="SVGID_11_"
+       gradientUnits="userSpaceOnUse"
+       x1="700"
+       y1="305.77591"
+       x2="700"
+       y2="55.775902">
+				<stop
+   offset="0"
+   style="stop-color:#DCDDDE"
+   id="stop34" />
+
+				<stop
+   offset="0.199"
+   style="stop-color:#E3E4E5"
+   id="stop35" />
+
+				<stop
+   offset="0.6062"
+   style="stop-color:#EEEEEF"
+   id="stop36" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F1F2F2"
+   id="stop37" />
+
+			</linearGradient>
+    <linearGradient
+       id="SVGID_12_"
+       gradientUnits="userSpaceOnUse"
+       x1="700"
+       y1="135.77589"
+       x2="700"
+       y2="55.775902">
+				<stop
+   offset="0"
+   style="stop-color:#f13e22;stop-opacity:1;"
+   id="stop38" />
+
+				<stop
+   offset="1"
+   style="stop-color:#f39844;stop-opacity:1;"
+   id="stop39" />
+
+			</linearGradient>
+  </defs>
+  <g
+     inkscape:label="Шар 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g41"
+       transform="matrix(0.26458333,0,0,0.26458333,-158.75,-14.763748)">
+		<g
+   id="g40">
+			<linearGradient
+   id="linearGradient4-5"
+   gradientUnits="userSpaceOnUse"
+   x1="700"
+   y1="305.77591"
+   x2="700"
+   y2="55.775902">
+				<stop
+   offset="0"
+   style="stop-color:#DCDDDE"
+   id="stop1-98" />
+
+				<stop
+   offset="0.199"
+   style="stop-color:#E3E4E5"
+   id="stop2-4" />
+
+				<stop
+   offset="0.6062"
+   style="stop-color:#EEEEEF"
+   id="stop3-81" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F1F2F2"
+   id="stop4-0" />
+
+			</linearGradient>
+
+			<polygon
+   class="st20"
+   points="600,305.8 600,55.8 740,55.8 800,115.8 800,305.8 "
+   id="polygon37"
+   style="fill:url(#SVGID_11_)" />
+
+			<linearGradient
+   id="linearGradient6-3"
+   gradientUnits="userSpaceOnUse"
+   x1="700"
+   y1="135.77589"
+   x2="700"
+   y2="55.775902">
+				<stop
+   offset="0"
+   style="stop-color:#F15A22"
+   id="stop5-0" />
+
+				<stop
+   offset="1"
+   style="stop-color:#FAA61A"
+   id="stop6-4" />
+
+			</linearGradient>
+
+			<polygon
+   class="st21"
+   points="600,55.8 600,135.8 800,135.8 800,115.8 740,55.8 "
+   id="polygon39"
+   style="fill:url(#SVGID_12_)" />
+
+			<polygon
+   class="st4"
+   points="740,55.8 740,115.8 800,115.8 "
+   id="polygon40"
+   style="opacity:0.3;fill:#ffffff" />
+
+			<text
+   transform="translate(611.9956,115.7764)"
+   class="st5 st6 st7 st8"
+   id="text40"
+   style="font-size:50px;font-family:Myriad-Bold;letter-spacing:2;display:none;fill:#ffffff">PPT</text>
+<text
+   class="st5 st6 st7 st8"
+   id="text26-5"
+   style="font-size:43.657px;font-family:Myriad-Bold;letter-spacing:1.74628;fill:#ffffff;stroke-width:0.87314"
+   x="702.23352"
+   y="100.6525"
+   transform="scale(0.87313986,1.1452919)">PPTX</text>
+
+		</g>
+
+		<text
+   transform="translate(660.1001,266.5039)"
+   class="st2 st15 st16 st17"
+   id="text41"
+   style="font-size:150px;font-family:Calibri-Bold;letter-spacing:12;opacity:0.15">P</text>
+
+	</g>
+  </g>
+</svg>

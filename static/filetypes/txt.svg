@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="52.916668mm"
+   height="66.145828mm"
+   viewBox="0 0 52.916668 66.145828"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="txt.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="52.916668"
+       height="66.145828"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="SVGID_13_"
+       gradientUnits="userSpaceOnUse"
+       x1="1237.9648"
+       y1="305.77591"
+       x2="1237.9648"
+       y2="55.775902">
+				<stop
+   offset="0"
+   style="stop-color:#DCDDDE"
+   id="stop41" />
+
+				<stop
+   offset="0.199"
+   style="stop-color:#E3E4E5"
+   id="stop42" />
+
+				<stop
+   offset="0.6062"
+   style="stop-color:#EEEEEF"
+   id="stop43" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F1F2F2"
+   id="stop44" />
+
+			</linearGradient>
+    <linearGradient
+       id="SVGID_14_"
+       gradientUnits="userSpaceOnUse"
+       x1="1237.9648"
+       y1="135.77589"
+       x2="1237.9648"
+       y2="55.775902">
+				<stop
+   offset="0"
+   style="stop-color:#58595B"
+   id="stop45" />
+
+				<stop
+   offset="1"
+   style="stop-color:#A7A9AC"
+   id="stop46" />
+
+			</linearGradient>
+  </defs>
+  <g
+     inkscape:label="Шар 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g48"
+       inkscape:export-filename="/files/Documents/PaperPlacer/static/filetypes/txt.svg"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="matrix(0.26458333,0,0,0.26458333,-301.09583,-14.76375)">
+		<g
+   id="g47">
+			<linearGradient
+   id="linearGradient4"
+   gradientUnits="userSpaceOnUse"
+   x1="1237.9648"
+   y1="305.77591"
+   x2="1237.9648"
+   y2="55.775902">
+				<stop
+   offset="0"
+   style="stop-color:#DCDDDE"
+   id="stop1" />
+
+				<stop
+   offset="0.199"
+   style="stop-color:#E3E4E5"
+   id="stop2" />
+
+				<stop
+   offset="0.6062"
+   style="stop-color:#EEEEEF"
+   id="stop3" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F1F2F2"
+   id="stop4" />
+
+			</linearGradient>
+
+			<polygon
+   class="st22"
+   points="1338,115.8 1338,305.8 1138,305.8 1138,55.8 1278,55.8 "
+   id="polygon44"
+   style="fill:url(#SVGID_13_)" />
+
+			<linearGradient
+   id="linearGradient6"
+   gradientUnits="userSpaceOnUse"
+   x1="1237.9648"
+   y1="135.77589"
+   x2="1237.9648"
+   y2="55.775902">
+				<stop
+   offset="0"
+   style="stop-color:#58595B"
+   id="stop5" />
+
+				<stop
+   offset="1"
+   style="stop-color:#A7A9AC"
+   id="stop6" />
+
+			</linearGradient>
+
+			<polygon
+   class="st23"
+   points="1338,115.8 1278,55.8 1138,55.8 1138,135.8 1338,135.8 "
+   id="polygon46"
+   style="fill:url(#SVGID_14_)" />
+
+			<polygon
+   class="st4"
+   points="1278,55.8 1278,115.8 1338,115.8 "
+   id="polygon47"
+   style="opacity:0.3;fill:#ffffff" />
+
+			<text
+   transform="translate(1149.9604,115.7764)"
+   class="st5 st6 st7 st8"
+   id="text47"
+   style="font-size:50px;font-family:Myriad-Bold;letter-spacing:2;fill:#ffffff">TXT</text>
+
+		</g>
+
+		<text
+   transform="translate(1200.6904,266.5039)"
+   class="st2 st15 st16 st17"
+   id="text48"
+   style="font-size:150px;font-family:Calibri-Bold;letter-spacing:12;opacity:0.15">T</text>
+
+	</g>
+  </g>
+</svg>

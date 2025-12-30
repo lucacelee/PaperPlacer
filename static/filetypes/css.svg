@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="52.916668mm"
+   height="66.145828mm"
+   viewBox="0 0 52.916668 66.145828"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="html.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="52.916668"
+       height="66.145828"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="SVGID_25_"
+       gradientUnits="userSpaceOnUse"
+       x1="968.98242"
+       y1="615"
+       x2="968.98242"
+       y2="365">
+				<stop
+   offset="0"
+   style="stop-color:#DCDDDE"
+   id="stop85" />
+
+				<stop
+   offset="0.199"
+   style="stop-color:#E3E4E5"
+   id="stop86" />
+
+				<stop
+   offset="0.6062"
+   style="stop-color:#EEEEEF"
+   id="stop87" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F1F2F2"
+   id="stop88" />
+
+			</linearGradient>
+    <linearGradient
+       id="SVGID_26_"
+       gradientUnits="userSpaceOnUse"
+       x1="968.98242"
+       y1="445"
+       x2="968.98242"
+       y2="365">
+				<stop
+   offset="0"
+   style="stop-color:#FAA61A"
+   id="stop89" />
+
+				<stop
+   offset="1"
+   style="stop-color:#FECF8D"
+   id="stop90" />
+
+			</linearGradient>
+  </defs>
+  <g
+     inkscape:label="Шар 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g93"
+       transform="matrix(0.26458333,0,0,0.26458333,-229.92291,-96.572914)">
+		<g
+   id="g91">
+			<linearGradient
+   id="linearGradient4"
+   gradientUnits="userSpaceOnUse"
+   x1="968.98242"
+   y1="615"
+   x2="968.98242"
+   y2="365">
+				<stop
+   offset="0"
+   style="stop-color:#DCDDDE"
+   id="stop1" />
+
+				<stop
+   offset="0.199"
+   style="stop-color:#E3E4E5"
+   id="stop2" />
+
+				<stop
+   offset="0.6062"
+   style="stop-color:#EEEEEF"
+   id="stop3" />
+
+				<stop
+   offset="1"
+   style="stop-color:#F1F2F2"
+   id="stop4" />
+
+			</linearGradient>
+
+			<polygon
+   class="st34"
+   points="869,615 869,365 1009,365 1069,425 1069,615 "
+   id="polygon88"
+   style="fill:url(#SVGID_25_)" />
+
+			<linearGradient
+   id="linearGradient6"
+   gradientUnits="userSpaceOnUse"
+   x1="968.98242"
+   y1="445"
+   x2="968.98242"
+   y2="365">
+				<stop
+   offset="0"
+   style="stop-color:#FAA61A"
+   id="stop5" />
+
+				<stop
+   offset="1"
+   style="stop-color:#FECF8D"
+   id="stop6" />
+
+			</linearGradient>
+
+			<polygon
+   class="st35"
+   points="869,365 869,445 1069,445 1069,425 1009,365 "
+   id="polygon90"
+   style="fill:url(#SVGID_26_)" />
+
+			<polygon
+   class="st4"
+   points="1009,365 1009,425 1069,425 "
+   id="polygon91"
+   style="opacity:0.3;fill:#ffffff" />
+
+			<text
+   transform="translate(880.978,425.0005)"
+   class="st5 st6 st7 st8"
+   id="text91"
+   style="font-size:50px;font-family:Myriad-Bold;letter-spacing:2;fill:#ffffff">CSS</text>
+
+		</g>
+
+		<g
+   id="g92">
+			<path
+   class="st2"
+   d="m 890.2,472 v 113.6 h 157.6 V 472 Z M 967,577.7 H 898.2 V 555.3 H 967 Z m 0,-50.8 H 898.2 V 504.5 H 967 Z m 72.8,26.4 H 971 v -22.4 h 68.8 z m 0,-50.8 H 971 V 480 h 68.8 z"
+   id="path91"
+   style="opacity:0.15" />
+
+		</g>
+
+	</g>
+  </g>
+</svg>
