@@ -8,11 +8,11 @@ const http_1 = __importDefault(require("http"));
 const render_1 = require("./render");
 const static_1 = require("./static");
 function serve() {
-    const server = http_1.default.createServer((request, response) => {
+    const server = http_1.default.createServer(async (request, response) => {
         if ((0, static_1.loadStatic)(request, response))
             return;
         response.writeHead(200);
-        response.end((0, render_1.renderHtml)("index.html"));
+        response.end(await (0, render_1.renderHtml)("index.html"));
     });
     server.listen(3000);
 }
