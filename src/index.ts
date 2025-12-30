@@ -11,7 +11,7 @@ import { serve } from "./server";
   }
 
   try {
-    // await maria.importFile("/files/Temp2/test.csv");
+    // await maria.importFile("/files/Temp2/Higher Applied Maths.csv");
   } catch (error) {
     console.log("Failed to import the CSV. Error:\n" + error)
   }

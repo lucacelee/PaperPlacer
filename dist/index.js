@@ -12,7 +12,7 @@ const server_1 = require("./server");
         console.log("Failed to connect to MariaDB. Error:\n" + error);
     }
     try {
-        // await maria.importFile("/files/Temp2/test.csv");
+        // await maria.importFile("/files/Temp2/Higher Applied Maths.csv");
     }
     catch (error) {
         console.log("Failed to import the CSV. Error:\n" + error);
