@@ -2,9 +2,11 @@ import http, { IncomingMessage, ServerResponse } from "http";
 import { writeFileSync, existsSync, mkdirSync, rmSync } from "fs";
 import url from 'url';
 import { join } from "node:path";
-import { renderHtml } from "./render";
+import { htmlRenderer } from "./render";
 import { loadStatic } from "./static";
 import { db } from "./db";
+
+const renderer: htmlRenderer = new htmlRenderer;
 
 export function serve () {
     const server = http.createServer(async (request: IncomingMessage, response: ServerResponse) => {
@@ -42,7 +44,7 @@ export function serve () {
                             writeFileSync(downloadPath, content);
 
                             response.writeHead(200);
-                            response.end(await renderHtml("upload_successfull.html"));
+                            response.end(await renderer.renderHtml("upload_successfull.html"));
 
                             const maria = new db;
                             if (downloadName.endsWith(".csv")) await maria.importFile(downloadPath);
@@ -54,10 +56,10 @@ export function serve () {
                     });
                 } else if (request.url != "/") {
                     response.writeHead(200);
-                    response.end(await renderHtml(htmlName));
+                    response.end(await renderer.renderHtml(htmlName));
                 } else {
                     response.writeHead(200);
-                    response.end(await renderHtml("index.html"));
+                    response.end(await renderer.renderHtml("index.html"));
                 }
             } else {
                 response.writeHead(404);

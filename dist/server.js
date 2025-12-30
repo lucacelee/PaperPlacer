@@ -10,6 +10,7 @@ const node_path_1 = require("node:path");
 const render_1 = require("./render");
 const static_1 = require("./static");
 const db_1 = require("./db");
+const renderer = new render_1.htmlRenderer;
 function serve() {
     const server = http_1.default.createServer(async (request, response) => {
         if ((0, static_1.loadStatic)(request, response))
@@ -41,7 +42,7 @@ function serve() {
                                 (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
                             (0, fs_1.writeFileSync)(downloadPath, content);
                             response.writeHead(200);
-                            response.end(await (0, render_1.renderHtml)("upload_successfull.html"));
+                            response.end(await renderer.renderHtml("upload_successfull.html"));
                             const maria = new db_1.db;
                             if (downloadName.endsWith(".csv"))
                                 await maria.importFile(downloadPath);
@@ -55,11 +56,11 @@ function serve() {
                 }
                 else if (request.url != "/") {
                     response.writeHead(200);
-                    response.end(await (0, render_1.renderHtml)(htmlName));
+                    response.end(await renderer.renderHtml(htmlName));
                 }
                 else {
                     response.writeHead(200);
-                    response.end(await (0, render_1.renderHtml)("index.html"));
+                    response.end(await renderer.renderHtml("index.html"));
                 }
             }
             else {
