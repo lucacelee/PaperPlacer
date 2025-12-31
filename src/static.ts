@@ -23,6 +23,12 @@ export function loadStatic (request: IncomingMessage, response: ServerResponse):
         case ".jpg":
             type = "image/jpeg";
             break;
+        case ".svg":
+            type = "image/svg+xml";
+            break;
+        case ".webp":
+            type = "image/webp";
+            break;
         case "":
             return false;
         default:

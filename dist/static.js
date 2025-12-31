@@ -29,6 +29,12 @@ function loadStatic(request, response) {
         case ".jpg":
             type = "image/jpeg";
             break;
+        case ".svg":
+            type = "image/svg+xml";
+            break;
+        case ".webp":
+            type = "image/webp";
+            break;
         case "":
             return false;
         default:

@@ -38,7 +38,8 @@ class db {
     }
     async getTableContents(table, what) {
         console.log(`Table: ${table}, what: ${what}`);
-        const request = await db.pool.query(`SELECT ${db.pool.escapeId(what)} FROM ${db.pool.escapeId(table)};`);
+        const selection = what[0] === '*' ? '*' : what.map(columns => db.pool.escapeId(columns)).join(', ');
+        const request = await db.pool.query(`SELECT ${selection} FROM ${db.pool.escapeId(table)};`);
         return request;
     }
 }

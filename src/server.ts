@@ -14,7 +14,9 @@ export function serve () {
         console.log(request.method + " " + request.url)
 
         if (request.url) {
-            const htmlName: string = request.url.split('/')[1] + ".html";
+            let urlStrings: string[];
+            renderer.urlComponents = urlStrings = request.url.split('/');
+            const htmlName: string = urlStrings[1] + ".html";
             let filepath:string = join(__dirname, "templates", htmlName);
             if (existsSync(filepath) || request.url == "/") {
                 if (request.url == "/upload" && request.method == "POST") {

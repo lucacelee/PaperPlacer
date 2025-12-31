@@ -17,7 +17,9 @@ function serve() {
             return;
         console.log(request.method + " " + request.url);
         if (request.url) {
-            const htmlName = request.url.split('/')[1] + ".html";
+            let urlStrings;
+            renderer.urlComponents = urlStrings = request.url.split('/');
+            const htmlName = urlStrings[1] + ".html";
             let filepath = (0, node_path_1.join)(__dirname, "templates", htmlName);
             if ((0, fs_1.existsSync)(filepath) || request.url == "/") {
                 if (request.url == "/upload" && request.method == "POST") {

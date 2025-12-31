@@ -41,9 +41,10 @@ export class db {
         return rows.length > 0;
     }
 
-    async getTableContents (table: string, what: string): Promise<Array<Record<string, any>>> {
+    async getTableContents (table: string, what: string[]): Promise<Array<Record<string, any>>> {
         console.log(`Table: ${table}, what: ${what}`);
-        const request = await db.pool.query(`SELECT ${db.pool.escapeId(what)} FROM ${db.pool.escapeId(table)};`);
+        const selection = what[0] === '*' ? '*' : what.map(columns => db.pool.escapeId(columns)).join(', ');
+        const request = await db.pool.query(`SELECT ${selection} FROM ${db.pool.escapeId(table)};`);
         return request as Array<Record<string, any>>;
     }
 }

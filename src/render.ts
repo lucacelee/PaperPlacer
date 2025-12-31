@@ -5,6 +5,8 @@ import { db } from "./db";
 export class htmlRenderer{
     templatesPath: string = path.join(__dirname, "templates");
     formatErgex: RegExp = /<\!--%(?<command>\w+)="(?<argument>.+?)"%-->/g;
+    insertErgex: RegExp = /\{\{(\d)\}\}/g;
+    urlComponents: string[] = [];
     static recursionCycles: number = 0;
 
     public async renderHtml (page: string) {
@@ -40,12 +42,25 @@ export class htmlRenderer{
                         const maria = new db;                                   // [table name] => [select statement]
                         const insertArgs: string[] = argparts[2].split("=>");
                         let tempHtml: string = "";
-                        let table: string = insertArgs[0] === '[[[url]]]' ? "" : insertArgs[0];
+                        let table: string = insertArgs[0] === '[[[url]]]' ? decodeURIComponent(this.urlComponents[2]) : insertArgs[0];
                         if (await maria.tableExists(table)) {
                             if (insertArgs[1] === '*') {
                                 console.log("Selecting * from table!!!");
-                                const trial = maria.getTableContents(insertArgs[0], ['*']);
-                                console.log(trial);
+                                const rows = await maria.getTableContents(table, ['*']);
+                                console.log(Object.values(rows));
+                                for (let r of rows) {
+                                    const fields: string[] = Object.values(r);
+                                    let text: string = argparts[0];
+
+                                    if (text.includes("[[mime-thumbnail]]")) {
+                                        const thumbnail: string = this.selectMediaTypeThumbnail(fields[2]);
+                                        text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
+                                    }
+
+                                    const insertions = text.matchAll(this.insertErgex);
+                                    tempHtml += text.replace(this.insertErgex, (_, index) => {return fields[parseInt(index)]}) + '\n';
+                                }
+                                return tempHtml;
                             } else {
                                 const sections: Array<Record<string, any>> = await maria.getTableContents(insertArgs[0], insertArgs[1].split(','));
                                 for (let s of sections) {
@@ -66,6 +81,66 @@ export class htmlRenderer{
                 break;
         }
         return "";
+    }
+
+    private selectMediaTypeThumbnail (mime: string): string {
+        switch (mime) {
+            case "application/pdf":
+                return "/filetypes/pdf.svg";
+            case "application/zip":
+                return "/filetypes/zip.svg";
+            case "application/mp4":
+                return "/filetypes/mp4.svg";
+            case "application/octet-stream":
+                return "/filetypes/bin.svg";
+            case "text/css":
+                return "/filetypes/css.svg";
+            case "text/html":
+                return "/filetypes/html.svg";
+            case "text/plain":
+                return "/filetypes/txt.svg";
+            case "image/png":
+                return "/filetypes/png.svg";
+            case "image/jpeg":
+                return "/filetypes/jpeg.svg";
+            case "image/gif":
+                return "/filetypes/gif.svg";
+            case "image/svg":
+                return "/filetypes/svg.svg";
+            case "image/svg-xml":
+                return "/filetypes/svg.svg";
+            case "audio/m4a":
+                return "/filetypes/m4a.svg";
+            case "audio/mp4":
+                return "/filetypes/m4a.svg";
+            case "audio/ogg":
+                return "/filetypes/opus.svg";
+            case "audio/opus":
+                return "/filetypes/opus.svg";
+            case "audio/vorbis":
+                return "/filetypes/vorbis.svg";
+            case "video/quicktime":
+                return "/filetypes/mov.svg";
+            case "video/mp4":
+                return "/filetypes/mp4.svg";
+            case "audio/mp4":
+                return "/filetypes/m4a.svg";
+            case "audio/mp3":
+                return "/filetypes/mp3.svg";
+            case "audio/mpeg":
+                return "/filetypes/mp3.svg";
+            case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                return "/filetypes/pptx.svg";
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                return "/filetypes/docx.svg";
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                return "/filetypes/xlsx.svg";
+            case "category":
+                return "/filetypes/oc.svg";
+            default:
+                return "/filetypes/default.svg"
+        }
+        return mime;
     }
 }
 
