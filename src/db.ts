@@ -21,15 +21,14 @@ export class db {
     public async importFile (filepath: string) {
         const conn = await db.pool.getConnection();
         console.log(`The path to the imported .csv is ${filepath}`);
-        const pathComponents:string[] = filepath.split('/');
+        const pathComponents:string[] = filepath.replace("/index.csv", ".csv").split('/');
         const filename:string = pathComponents[pathComponents.length-1];
-        let name:string = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
+        let name: string = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
         if (!db.windowsModeCategoryHandling) {
             name = name.replaceAll('\\', '/');
         } else {
             name = name.replaceAll(' in ', '/');
         }
-        name = name.endsWith("/index") ? name.replace("/index", "") : name;
         console.log(`The file name is ${name}`);
         try {
             await conn.beginTransaction();

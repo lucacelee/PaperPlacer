@@ -14,7 +14,7 @@ class db {
     async importFile(filepath) {
         const conn = await db.pool.getConnection();
         console.log(`The path to the imported .csv is ${filepath}`);
-        const pathComponents = filepath.split('/');
+        const pathComponents = filepath.replace("/index.csv", ".csv").split('/');
         const filename = pathComponents[pathComponents.length - 1];
         let name = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
         if (!db.windowsModeCategoryHandling) {
@@ -23,7 +23,6 @@ class db {
         else {
             name = name.replaceAll(' in ', '/');
         }
-        name = name.endsWith("/index") ? name.replace("/index", "") : name;
         console.log(`The file name is ${name}`);
         try {
             await conn.beginTransaction();
