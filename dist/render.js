@@ -50,7 +50,7 @@ class htmlRenderer {
                         const maria = new db_1.db; // [table name] => [select statement]
                         const insertArgs = argparts[2].split("=>");
                         let tempHtml = "";
-                        let table = insertArgs[0] === '[[[url]]]' ? decodeURIComponent(this.urlComponents[2]) : insertArgs[0];
+                        let table = insertArgs[0] === '[[[url]]]' ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
                         if (await maria.tableExists(table)) {
                             if (insertArgs[1] === '*') {
                                 console.log("Selecting * from table!!!");
