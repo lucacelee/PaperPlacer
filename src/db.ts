@@ -62,7 +62,7 @@ export class db {
         if (truncatedFilepathComponents.length > 0) await this.createMissingEntries(conn, truncatedFilepathComponents, component, csvPath);
         else try {
             await conn.query(`LOAD DATA LOCAL INFILE ? INTO TABLE ${conn.escapeId(component)} IGNORE 1 LINES (name, mime, @url, transcript) SET url = IF(LOWER(mime) = 'category', CONCAT(?, '/', @url), @url), iscategory = IF(mime = 'category', TRUE, FALSE)`, [csvPath, component]);
-            await conn.query(`CREATE FULLTEXT INDEX IF NOT EXISTS transcript_index ON ${conn.escapeId(component)} (transcript)`);
+            await conn.query(`CREATE FULLTEXT INDEX IF NOT EXISTS transcript_index ON ${conn.escapeId(component)} (name, transcript)`);
         } catch (error) {
             console.error(`Failed to import the file (${component}). Error:\n${error}`);
             throw error;
@@ -84,6 +84,11 @@ export class db {
         console.log(`Table: ${table}, what: ${what}`);
         const selection = what[0] === '*' ? '*' : what.map(columns => db.pool.escapeId(columns)).join(', ');
         const request = await db.pool.query(`SELECT ${selection} FROM ${db.pool.escapeId(table)};`);
+        return request as Array<Record<string, any>>;
+    }
+
+    public async searchTable (table: string, prompt: string): Promise<Array<Record<string, any>>> {
+        const request = await db.pool.query(`SELECT *, MATCH (name, transcript) AGAINST ('${db.pool.escape(prompt)}') AS relevance FROM ${db.pool.escapeId(table)} ORDER BY relevance DESC;`);
         return request as Array<Record<string, any>>;
     }
 }
