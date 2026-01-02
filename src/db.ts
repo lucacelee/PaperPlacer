@@ -2,7 +2,7 @@ import mariadb from 'mariadb';
 import 'dotenv/config';
 
 export class db {
-    static pool = mariadb.createPool({
+    private static pool = mariadb.createPool({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
@@ -11,37 +11,72 @@ export class db {
       trace: true     // Development only!
     });
 
-    async setup () {
+    public static windowsModeCategoryHandling: boolean = false;
+
+    public async setup () {
         let table = await db.pool.query("CREATE TABLE IF NOT EXISTS ppindex (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, section TINYTEXT CHARACTER SET utf8 NOT NULL);");
         console.log(table);
     }
 
-    async importFile (filepath: string) {
+    public async importFile (filepath: string) {
         const conn = await db.pool.getConnection();
         console.log(`The path to the imported .csv is ${filepath}`);
-        let pathComponents:string[] = filepath.split('/');
-        let filename:string = pathComponents[pathComponents.length-1];
+        const pathComponents:string[] = filepath.split('/');
+        const filename:string = pathComponents[pathComponents.length-1];
         let name:string = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
+        name = name.replaceAll('\\', '/');
+        name = name.endsWith("/index") ? name.replace("/index", "") : name;
         console.log(`The file name is ${name}`);
         try {
-            conn.query(`INSERT INTO ppindex SET section = ?`, [name]);
-            await conn.query(`CREATE TABLE IF NOT EXISTS ${conn.escapeId(name)} (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, name VARCHAR(511) CHARACTER SET utf8mb4, mime TINYTEXT CHARACTER SET ascii, url VARCHAR(2048) CHARACTER SET ascii, transcript LONGTEXT CHARACTER SET utf8mb4, iscategory BOOLEAN NOT NULL DEFAULT FALSE, PRIMARY KEY (id), UNIQUE KEY link (url));`);
-            await conn.query(`LOAD DATA LOCAL INFILE ? INTO TABLE ${conn.escapeId(name)} IGNORE 1 LINES (name, mime, url, transcript) SET iscategory = IF(mime = 'category', TRUE, FALSE)`, [filepath]);
-            await conn.query(`CREATE FULLTEXT INDEX transcript_index ON ${conn.escapeId(name)} (transcript)`);
+            await conn.beginTransaction();
+            await this.createMissingEntries(conn, name.split('/'), '', filepath);
+            await conn.commit();
         } catch (error) {
-            console.error(`Failed to import the file! Error:\n${error}`);
+            await conn.rollback();
+            console.error(`Failed to fill in missing data structure. Error:\n${error}`);
         } finally {
             conn.release();
         }
     }
 
-    async tableExists (table: string): Promise<Boolean> {
+    public async tableExists (table: string): Promise<boolean> {
         console.log(`Does table ${table} exist?`)
         const rows = await db.pool.query(`SHOW TABLES LIKE ?`, [table]);
         return rows.length > 0;
     }
 
-    async getTableContents (table: string, what: string[]): Promise<Array<Record<string, any>>> {
+    private async createMissingEntries (conn: mariadb.PoolConnection, filepathComponents: string[], previouslyDefinedTables: string, csvPath: string) {
+        const component = ((previouslyDefinedTables == "") ? '' : previouslyDefinedTables + '/') + filepathComponents[0];
+        const exists = await this.tableExistsTransactionally(conn, component);
+        if (!exists) await conn.query(`CREATE TABLE IF NOT EXISTS ${conn.escapeId(component)} (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, name VARCHAR(511) CHARACTER SET utf8mb4, mime TINYTEXT CHARACTER SET ascii, url VARCHAR(2048) CHARACTER SET ascii, transcript LONGTEXT CHARACTER SET utf8mb4, iscategory BOOLEAN NOT NULL DEFAULT FALSE, PRIMARY KEY (id), UNIQUE KEY link (url));`);
+        if (!await this.rowExistsTransactionally(conn, ((previouslyDefinedTables == "") ? 'ppindex' : previouslyDefinedTables), filepathComponents[0])) {
+            if (previouslyDefinedTables == "") await conn.query(`INSERT INTO ppindex SET section = ?`, [component]);
+            else await conn.query(`INSERT INTO ${conn.escapeId(previouslyDefinedTables)} SET name = ?, mime = 'category', url = ?, iscategory = true`, [filepathComponents[0], component]);
+        }
+        const truncatedFilepathComponents: string[] = [...filepathComponents];
+        truncatedFilepathComponents.shift()
+        if (truncatedFilepathComponents.length > 1) await this.createMissingEntries(conn, truncatedFilepathComponents, component, csvPath);
+        else try {
+            await conn.query(`LOAD DATA LOCAL INFILE ? INTO TABLE ${conn.escapeId(component)} IGNORE 1 LINES (name, mime, url, transcript) SET iscategory = IF(mime = 'category', TRUE, FALSE)`, [csvPath]);
+            await conn.query(`CREATE FULLTEXT INDEX IF NOT EXISTS transcript_index ON ${conn.escapeId(component)} (transcript)`);
+        } catch (error) {
+            console.error(`Failed to import the file (${component}). Error:\n${error}`);
+            throw error;
+        }
+    }
+
+    private async tableExistsTransactionally (conn: mariadb.PoolConnection, table: string): Promise<boolean> {
+        console.log(`Does table ${table} exist?`)
+        const rows = await conn.query(`SHOW TABLES LIKE ?`, [table]);
+        return rows.length > 0;
+    }
+
+    private async rowExistsTransactionally (conn: mariadb.PoolConnection, table: string, row: string): Promise<boolean> {
+        const rows = (table == 'ppindex') ? await conn.query(`SELECT section FROM ${conn.escapeId(table)} WHERE section = ?`, [row]) : await conn.query(`SELECT name FROM ${conn.escapeId(table)} WHERE name = ?`, [row]);
+        return rows.length > 0;
+    }
+
+    public async getTableContents (table: string, what: string[]): Promise<Array<Record<string, any>>> {
         console.log(`Table: ${table}, what: ${what}`);
         const selection = what[0] === '*' ? '*' : what.map(columns => db.pool.escapeId(columns)).join(', ');
         const request = await db.pool.query(`SELECT ${selection} FROM ${db.pool.escapeId(table)};`);

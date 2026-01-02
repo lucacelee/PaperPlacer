@@ -27,7 +27,7 @@ class htmlRenderer {
             if (command == null || argument == null)
                 break;
             const thestring = m[0];
-            console.log(`\nMatch found: ${thestring}.\nCommand: '${command}', argument: '${argument}'`);
+            // console.log(`\nMatch found: ${thestring}.\nCommand: '${command}', argument: '${argument}'`)
             html = html.replace(thestring, await this.processTags(command, argument));
             htmlRenderer.recursionCycles = 0;
         }
@@ -55,7 +55,7 @@ class htmlRenderer {
                             if (insertArgs[1] === '*') {
                                 console.log("Selecting * from table!!!");
                                 const rows = await maria.getTableContents(table, ['*']);
-                                console.log(Object.values(rows));
+                                // console.log(Object.values(rows));
                                 for (let r of rows) {
                                     const fields = Object.values(r);
                                     let text = argparts[0];
@@ -81,7 +81,7 @@ class htmlRenderer {
                     case "count":
                         break;
                 }
-                console.log(argparts);
+                // console.log(argparts)
                 break;
             default:
                 console.error(`Command ${command} not found.`);
