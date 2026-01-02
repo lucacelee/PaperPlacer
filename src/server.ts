@@ -42,17 +42,17 @@ export function serve () {
                             const downloadName = (bufferFilename == null) ? "unnamed" : bufferFilename[1];
                             
                             const tmpDir = join(__dirname, "../tmp");
-                            const downloadPath = join(tmpDir, downloadName);
+                            const downloadPath = join(tmpDir, downloadName).replace(".oc", ".zip");
                             if (!existsSync(tmpDir)) mkdirSync(tmpDir, {recursive: true});
                             writeFileSync(downloadPath, content);
-
-                            response.writeHead(200);
-                            response.end(await renderer.renderHtml("upload_successfull.html"));
 
                             const maria = new db;
                             if (downloadName.endsWith(".csv")) await maria.importFile(downloadPath);
                             else if (downloadName.endsWith(".oc")) await processCatalogue(downloadPath);
                             rmSync(downloadPath);
+
+                            response.writeHead(200);
+                            response.end(await renderer.renderHtml("upload_successfull.html"));
                         } catch (error) {
                             response.writeHead(500);
                             response.end(`<!DOCTYPE html><html><body><h1>HTTP 500</h1><h2>Upload failed!</h2><p>${error}</p></body></html>`);

@@ -40,18 +40,18 @@ function serve() {
                             const bufferFilename = metadata.toString("utf-8").match(filenameRegex);
                             const downloadName = (bufferFilename == null) ? "unnamed" : bufferFilename[1];
                             const tmpDir = (0, node_path_1.join)(__dirname, "../tmp");
-                            const downloadPath = (0, node_path_1.join)(tmpDir, downloadName);
+                            const downloadPath = (0, node_path_1.join)(tmpDir, downloadName).replace(".oc", ".zip");
                             if (!(0, fs_1.existsSync)(tmpDir))
                                 (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
                             (0, fs_1.writeFileSync)(downloadPath, content);
-                            response.writeHead(200);
-                            response.end(await renderer.renderHtml("upload_successfull.html"));
                             const maria = new db_1.db;
                             if (downloadName.endsWith(".csv"))
                                 await maria.importFile(downloadPath);
                             else if (downloadName.endsWith(".oc"))
                                 await (0, catalogues_1.processCatalogue)(downloadPath);
                             (0, fs_1.rmSync)(downloadPath);
+                            response.writeHead(200);
+                            response.end(await renderer.renderHtml("upload_successfull.html"));
                         }
                         catch (error) {
                             response.writeHead(500);
