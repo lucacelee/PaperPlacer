@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { htmlRenderer } from "./render";
 import { loadStatic } from "./static";
 import { db } from "./db";
+import { processCatalogue } from "./catalogues";
 
 const renderer: htmlRenderer = new htmlRenderer;
 
@@ -50,6 +51,7 @@ export function serve () {
 
                             const maria = new db;
                             if (downloadName.endsWith(".csv")) await maria.importFile(downloadPath);
+                            else if (downloadName.endsWith(".oc")) await processCatalogue(downloadPath);
                             rmSync(downloadPath);
                         } catch (error) {
                             response.writeHead(500);

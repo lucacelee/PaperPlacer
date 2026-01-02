@@ -10,6 +10,7 @@ const node_path_1 = require("node:path");
 const render_1 = require("./render");
 const static_1 = require("./static");
 const db_1 = require("./db");
+const catalogues_1 = require("./catalogues");
 const renderer = new render_1.htmlRenderer;
 function serve() {
     const server = http_1.default.createServer(async (request, response) => {
@@ -48,6 +49,8 @@ function serve() {
                             const maria = new db_1.db;
                             if (downloadName.endsWith(".csv"))
                                 await maria.importFile(downloadPath);
+                            else if (downloadName.endsWith(".oc"))
+                                await (0, catalogues_1.processCatalogue)(downloadPath);
                             (0, fs_1.rmSync)(downloadPath);
                         }
                         catch (error) {
