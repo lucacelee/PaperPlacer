@@ -14,7 +14,7 @@ class db {
     async importFile(filepath) {
         const conn = await db.pool.getConnection();
         console.log(`The path to the imported .csv is ${filepath}`);
-        const pathComponents = filepath.replace("/index.csv", ".csv").split('/');
+        const pathComponents = filepath.replace("/index.csv", ".csv").split('/tmp/');
         const filename = pathComponents[pathComponents.length - 1];
         let name = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
         if (!db.windowsModeCategoryHandling) {
@@ -45,6 +45,7 @@ class db {
     async createMissingEntries(conn, filepathComponents, previouslyDefinedTables, csvPath) {
         const component = ((previouslyDefinedTables == "") ? '' : previouslyDefinedTables + '/') + filepathComponents[0];
         const exists = await this.tableExistsTransactionally(conn, component);
+        console.log(`Creating missing entries: current component is ${component}\n`);
         if (!exists)
             await conn.query(`CREATE TABLE IF NOT EXISTS ${conn.escapeId(component)} (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, name VARCHAR(511) CHARACTER SET utf8mb4, mime TINYTEXT CHARACTER SET ascii, url VARCHAR(2048) CHARACTER SET ascii, transcript LONGTEXT CHARACTER SET utf8mb4, iscategory BOOLEAN NOT NULL DEFAULT FALSE, PRIMARY KEY (id), UNIQUE KEY link (url));`);
         if (!await this.rowExistsTransactionally(conn, ((previouslyDefinedTables == "") ? 'ppindex' : previouslyDefinedTables), filepathComponents[0])) {
@@ -55,11 +56,11 @@ class db {
         }
         const truncatedFilepathComponents = [...filepathComponents];
         truncatedFilepathComponents.shift();
-        if (truncatedFilepathComponents.length > 1)
+        if (truncatedFilepathComponents.length > 0)
             await this.createMissingEntries(conn, truncatedFilepathComponents, component, csvPath);
         else
             try {
-                await conn.query(`LOAD DATA LOCAL INFILE ? INTO TABLE ${conn.escapeId(component)} IGNORE 1 LINES (name, mime, url, transcript) SET iscategory = IF(mime = 'category', TRUE, FALSE)`, [csvPath]);
+                await conn.query(`LOAD DATA LOCAL INFILE ? INTO TABLE ${conn.escapeId(component)} IGNORE 1 LINES (name, mime, @url, transcript) SET url = IF(LOWER(mime) = 'category', CONCAT(?, '/', @url), @url), iscategory = IF(mime = 'category', TRUE, FALSE)`, [csvPath, component]);
                 await conn.query(`CREATE FULLTEXT INDEX IF NOT EXISTS transcript_index ON ${conn.escapeId(component)} (transcript)`);
             }
             catch (error) {
