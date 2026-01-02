@@ -2,9 +2,11 @@ body {
     background-image: url("wood2.jpg");
     background-size: cover;
     font-family: Georgia, 'Times New Roman', Times, serif;
+    padding-top: 1rem;
 }
 
 main {
+    padding-top: 2rem;
     margin: auto;
     max-width: 1000px;
     border: 3px white;
@@ -12,11 +14,44 @@ main {
 }
 
 header {
-    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    margin: auto;
+    max-width: 1000px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(1rem);
+    border: 0.1rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 2rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+header > a {
+    text-decoration: none;
 }
 
 footer {
     text-align: center;
+}
+
+form {
+    width: 40em;
+    margin-right: auto;
+}
+
+input[type="search"] {
+    color: brown;
+    width: 100%;
+    text-align: left;
+    font-size: medium;
+    padding: 0.3rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(1rem);
+    border: 0.1rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transition: 0.2s;
 }
 
 .flex {
@@ -136,4 +171,37 @@ footer {
     display: grid;
     grid-template-columns: 33% 33% 33%;
     margin: auto;
+}
+
+#upload {
+    color: brown;
+    font-size: medium;
+    padding: 0.3rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(1rem);
+    border: 0.1rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transition: 0.2s;
+}
+
+#upload a {
+    flex: 2;
+}
+
+#back {
+    color: brown;
+    font-size: medium;
+    padding: 0.3rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(1rem);
+    border: 0.1rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    margin-right: 1rem;
+}
+
+#back a {
+    flex: 1;
 }
