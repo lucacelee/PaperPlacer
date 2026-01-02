@@ -17,7 +17,12 @@ class db {
         const pathComponents = filepath.split('/');
         const filename = pathComponents[pathComponents.length - 1];
         let name = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
-        name = name.replaceAll('\\', '/');
+        if (!db.windowsModeCategoryHandling) {
+            name = name.replaceAll('\\', '/');
+        }
+        else {
+            name = name.replaceAll(' in ', '/');
+        }
         name = name.endsWith("/index") ? name.replace("/index", "") : name;
         console.log(`The file name is ${name}`);
         try {
