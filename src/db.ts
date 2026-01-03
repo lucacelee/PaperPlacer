@@ -88,7 +88,7 @@ export class db {
     }
 
     public async searchTable (table: string, prompt: string): Promise<Array<Record<string, any>>> {
-        const request = await db.pool.query(`SELECT *, MATCH (name, transcript) AGAINST ('${db.pool.escape(prompt)}') AS relevance FROM ${db.pool.escapeId(table)} ORDER BY relevance DESC;`);
+        const request = await db.pool.query(`SELECT *, MATCH (name, transcript) AGAINST (${db.pool.escape(prompt)}) AS relevance FROM ${db.pool.escapeId(table)} ORDER BY relevance DESC;`);
         return request as Array<Record<string, any>>;
     }
 }

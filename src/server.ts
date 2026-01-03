@@ -8,6 +8,7 @@ import { db } from "./db";
 import { processCatalogue } from "./catalogues";
 
 const renderer: htmlRenderer = new htmlRenderer;
+const searchErgex: RegExp = /\?search=(.+)/;
 
 export function serve () {
     const server = http.createServer(async (request: IncomingMessage, response: ServerResponse) => {
@@ -59,8 +60,14 @@ export function serve () {
                         }
                     });
                 } else if (request.url != "/") {
-                    response.writeHead(200);
-                    response.end(await renderer.renderHtml(htmlName));
+                    if (searchErgex.test(request.url)) {
+                        console.log('Someone is searching something!');
+                        response.writeHead(200);
+                        response.end(await renderer.renderHtml("search.html"))
+                    } else {
+                        response.writeHead(200);
+                        response.end(await renderer.renderHtml(htmlName));
+                    }
                 } else {
                     response.writeHead(200);
                     response.end(await renderer.renderHtml("index.html"));

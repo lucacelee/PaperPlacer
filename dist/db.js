@@ -84,7 +84,7 @@ class db {
         return request;
     }
     async searchTable(table, prompt) {
-        const request = await db.pool.query(`SELECT *, MATCH (name, transcript) AGAINST ('${db.pool.escape(prompt)}') AS relevance FROM ${db.pool.escapeId(table)} ORDER BY relevance DESC;`);
+        const request = await db.pool.query(`SELECT *, MATCH (name, transcript) AGAINST (${db.pool.escape(prompt)}) AS relevance FROM ${db.pool.escapeId(table)} ORDER BY relevance DESC;`);
         return request;
     }
 }

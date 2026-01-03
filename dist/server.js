@@ -12,6 +12,7 @@ const static_1 = require("./static");
 const db_1 = require("./db");
 const catalogues_1 = require("./catalogues");
 const renderer = new render_1.htmlRenderer;
+const searchErgex = /\?search=(.+)/;
 function serve() {
     const server = http_1.default.createServer(async (request, response) => {
         if ((0, static_1.loadStatic)(request, response))
@@ -60,8 +61,15 @@ function serve() {
                     });
                 }
                 else if (request.url != "/") {
-                    response.writeHead(200);
-                    response.end(await renderer.renderHtml(htmlName));
+                    if (searchErgex.test(request.url)) {
+                        console.log('Someone is searching something!');
+                        response.writeHead(200);
+                        response.end(await renderer.renderHtml("search.html"));
+                    }
+                    else {
+                        response.writeHead(200);
+                        response.end(await renderer.renderHtml(htmlName));
+                    }
                 }
                 else {
                     response.writeHead(200);

@@ -12,10 +12,12 @@ class htmlRenderer {
         this.templatesPath = node_path_1.default.join(__dirname, "templates");
         this.formatErgex = /<\!--%(?<command>\w+)="(?<argument>.+?)"%-->/g;
         this.insertErgex = /\{\{(\d)\}\}/g;
+        this.searchErgex = /\?search=(.+)/;
         this.urlComponents = [];
     }
     async renderHtml(page) {
         let html = fs_1.default.readFileSync(node_path_1.default.join(this.templatesPath, page), 'utf8');
+        console.log('Rendering HTML');
         return await this.loopRegex(html);
     }
     async loopRegex(html) {
@@ -27,7 +29,7 @@ class htmlRenderer {
             if (command == null || argument == null)
                 break;
             const thestring = m[0];
-            // console.log(`\nMatch found: ${thestring}.\nCommand: '${command}', argument: '${argument}'`)
+            console.log(`\nMatch found: ${thestring}.\nCommand: '${command}', argument: '${argument}'\n`);
             html = html.replace(thestring, await this.processTags(command, argument));
             htmlRenderer.recursionCycles = 0;
         }
@@ -63,7 +65,6 @@ class htmlRenderer {
                                         const thumbnail = this.selectMediaTypeThumbnail(fields[2]);
                                         text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
                                     }
-                                    const insertions = text.matchAll(this.insertErgex);
                                     tempHtml += text.replace(this.insertErgex, (_, index) => { return fields[parseInt(index)]; }) + '\n';
                                 }
                                 return tempHtml;
@@ -80,6 +81,25 @@ class htmlRenderer {
                         break;
                     case "count":
                         break;
+                    case "search":
+                        const maria2 = new db_1.db;
+                        const searchArgs = argparts[2].split("?");
+                        const queryArgs = this.urlComponents[this.urlComponents.length - 1].split('=');
+                        let tmpHtml = "";
+                        const searchTable = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
+                        const searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
+                        const results = await maria2.searchTable(searchTable, searchPrompt);
+                        console.log(`\nSearching in ${searchTable} for '${searchPrompt}'. Here are the results:\n${results}`);
+                        for (const r of results) {
+                            const fields = Object.values(r);
+                            let text = argparts[0];
+                            if (text.includes("[[mime-thumbnail]]")) {
+                                const thumbnail = this.selectMediaTypeThumbnail(fields[2]);
+                                text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
+                            }
+                            tmpHtml += text.replace(this.insertErgex, (_, index) => { return fields[parseInt(index)]; }) + '\n';
+                        }
+                        return tmpHtml;
                 }
                 // console.log(argparts)
                 break;
