@@ -82,9 +82,17 @@ export class htmlRenderer{
                         const searchTable: string = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
                         const searchPrompt: string = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
 
-                        const results: Record<string, any>[] = await maria2.searchTable(searchTable, searchPrompt);
+                        let results: Record<string, any>[];
+                        try {
+                            results = await maria2.searchTable(searchTable, searchPrompt);
+                        } catch (error) {
+                            console.warn(`Failed to search for ${searchPrompt} in ${searchTable}.\n${error}`);
+                            let text: string = argparts[0];
+                            tmpHtml += text.replace(this.insertErgex, `<h2>No search results!</h2>`)
+                            break;
+                        }
 
-                        console.log(`\nSearching in ${searchTable} for '${searchPrompt}'. Here are the results:\n${results}`);
+                        console.log(`\nSearching in ${searchTable} for '${searchPrompt}'.`);
 
                         for (const r of results) {
                             const fields: string[] = Object.values(r);
