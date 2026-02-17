@@ -84,7 +84,17 @@ class db {
         return request;
     }
     async searchTable(table, prompt) {
-        const request = await db.pool.query(`SELECT *, MATCH (name, transcript) AGAINST (${db.pool.escape(prompt)}) AS relevance FROM ${db.pool.escapeId(table)} ORDER BY relevance DESC;`);
+        let request = await db.pool.query(`SELECT *, MATCH (name, transcript) AGAINST (${db.pool.escape(prompt)}) AS relevance FROM ${db.pool.escapeId(table)} ORDER BY relevance DESC;`);
+        const internalCategories = Object.values(await db.pool.query(`SELECT url FROM ${db.pool.escapeId(table)} WHERE iscategory = true`));
+        for (let category of internalCategories) {
+            try {
+                const extraResults = await this.searchTable(category.url, prompt);
+                request = request.concat(extraResults);
+            }
+            catch (error) {
+                console.log(`An error occurred while searching:\n${error}`);
+            }
+        }
         return request;
     }
 }
