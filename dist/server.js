@@ -18,70 +18,76 @@ function serve() {
         if ((0, static_1.loadStatic)(request, response))
             return;
         console.log(request.method + " " + request.url);
-        if (request.url) {
-            let urlStrings;
-            renderer.urlComponents = urlStrings = request.url.split('/');
-            const htmlName = urlStrings[1] + ".html";
-            let filepath = (0, node_path_1.join)(__dirname, "templates", htmlName);
-            if ((0, fs_1.existsSync)(filepath) || request.url == "/") {
-                if (request.url == "/upload" && request.method == "POST") {
-                    const body = [];
-                    request.on('data', (chunk) => {
-                        body.push(chunk);
-                    });
-                    request.on('end', async () => {
-                        try {
-                            const buffer = Buffer.concat(body);
-                            const header = buffer.subarray(0, buffer.indexOf('\r\n'));
-                            const contentStart = buffer.indexOf('\r\n\r\n') + '\r\n\r\n'.length;
-                            const contentEnd = buffer.lastIndexOf(Buffer.concat([Buffer.from('\r\n'), header]));
-                            const content = buffer.subarray(contentStart, contentEnd);
-                            const metadata = buffer.subarray(header.length, contentStart);
-                            const filenameRegex = /filename="(.+?)"/;
-                            const bufferFilename = metadata.toString("utf-8").match(filenameRegex);
-                            const downloadName = (bufferFilename == null) ? "unnamed" : bufferFilename[1];
-                            const tmpDir = (0, node_path_1.join)(__dirname, "../tmp");
-                            const downloadPath = (0, node_path_1.join)(tmpDir, downloadName).replace(".oc", ".zip");
-                            if (!(0, fs_1.existsSync)(tmpDir))
-                                (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
-                            (0, fs_1.writeFileSync)(downloadPath, content);
-                            const maria = new db_1.db;
-                            if (downloadName.endsWith(".csv"))
-                                await maria.importFile(downloadPath);
-                            else if (downloadName.endsWith(".oc"))
-                                await (0, catalogues_1.processCatalogue)(downloadPath);
-                            (0, fs_1.rmSync)(downloadPath);
-                            response.writeHead(200);
-                            response.end(await renderer.renderHtml("upload_successfull.html"));
-                        }
-                        catch (error) {
-                            response.writeHead(500);
-                            response.end(`<!DOCTYPE html><html><body><h1>HTTP 500</h1><h2>Upload failed!</h2><p>${error}</p></body></html>`);
-                        }
-                    });
+        if (!request.url)
+            return;
+        let urlStrings;
+        renderer.urlComponents = urlStrings = request.url.split('/');
+        const htmlName = urlStrings[1] + ".html";
+        let filepath = (0, node_path_1.join)(__dirname, "templates", htmlName);
+        if (!(0, fs_1.existsSync)(filepath) && request.url != '/') {
+            response.writeHead(404);
+            response.end(`404: Not found!`);
+            return;
+        }
+        if (request.url == '/upload' && request.method == "POST") {
+            const body = [];
+            request.on('data', (chunk) => {
+                body.push(chunk);
+            });
+            request.on('end', async () => {
+                let success = false;
+                try {
+                    await importDownload(body);
+                    success = true;
                 }
-                else if (request.url != "/") {
-                    if (searchErgex.test(request.url)) {
-                        console.log('Someone is searching something!');
-                        response.writeHead(200);
-                        response.end(await renderer.renderHtml("search.html"));
-                    }
-                    else {
-                        response.writeHead(200);
-                        response.end(await renderer.renderHtml(htmlName));
-                    }
+                catch (error) {
+                    response.writeHead(500);
+                    response.end(`<!DOCTYPE html><html><body><h1>HTTP 500</h1><h2>Upload failed!</h2><p>${error}</p></body></html>`);
                 }
-                else {
+                if (success) {
                     response.writeHead(200);
-                    response.end(await renderer.renderHtml("index.html"));
+                    response.end(await renderer.renderHtml("upload_successfull.html"));
                 }
+            });
+        }
+        else if (request.url == "/") {
+            response.writeHead(200);
+            response.end(await renderer.renderHtml("index.html"));
+        }
+        else {
+            if (searchErgex.test(request.url)) {
+                console.log('Someone is searching something!');
+                response.writeHead(200);
+                response.end(await renderer.renderHtml("search.html"));
             }
             else {
-                response.writeHead(404);
-                response.end(`404: Not found!`);
+                response.writeHead(200);
+                response.end(await renderer.renderHtml(htmlName));
             }
         }
     });
     server.listen(3000);
+}
+async function importDownload(body) {
+    const buffer = Buffer.concat(body);
+    const header = buffer.subarray(0, buffer.indexOf('\r\n'));
+    const contentStart = buffer.indexOf('\r\n\r\n') + '\r\n\r\n'.length;
+    const contentEnd = buffer.lastIndexOf(Buffer.concat([Buffer.from('\r\n'), header]));
+    const content = buffer.subarray(contentStart, contentEnd);
+    const metadata = buffer.subarray(header.length, contentStart);
+    const filenameRegex = /filename="(.+?)"/;
+    const bufferFilename = metadata.toString("utf-8").match(filenameRegex);
+    const downloadName = (bufferFilename == null) ? "unnamed" : bufferFilename[1];
+    const tmpDir = (0, node_path_1.join)(__dirname, "../tmp");
+    const downloadPath = (0, node_path_1.join)(tmpDir, downloadName).replace(".oc", ".zip");
+    if (!(0, fs_1.existsSync)(tmpDir))
+        (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
+    (0, fs_1.writeFileSync)(downloadPath, content);
+    const maria = new db_1.db;
+    if (downloadName.endsWith(".csv"))
+        await maria.importFile(downloadPath);
+    else if (downloadName.endsWith(".oc"))
+        await (0, catalogues_1.processCatalogue)(downloadPath);
+    (0, fs_1.rmSync)(downloadPath);
 }
 //# sourceMappingURL=server.js.map
