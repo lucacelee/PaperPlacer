@@ -41,77 +41,86 @@ export class htmlRenderer{
                 const argparts: string[] = argument.split(':')  // When asking for an insert, the argument consists of 3 parts:
                 switch (argparts[1]) {                          // [HTML element(s) : Desired action : Action specific argument]
                     case "db":                              // db — list from a database
-                        const maria = new db;                                   // [table name] => [select statement]
-                        const insertArgs: string[] = argparts[2].split("=>");
-                        let tempHtml: string = "";
-                        let table: string = insertArgs[0] === '[[[url]]]' ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
-                        if (await maria.tableExists(table)) {
-                            if (insertArgs[1] === '*') {
-                                console.log("Selecting * from table!!!");
-                                const rows = await maria.getTableContents(table, ['*']);
-                                // console.log(Object.values(rows));
-                                for (let r of rows) {
-                                    const fields: string[] = Object.values(r);
-                                    let text: string = argparts[0];
-
-                                    if (text.includes("[[mime-thumbnail]]")) {
-                                        const thumbnail: string = this.selectMediaTypeThumbnail(fields[2]);
-                                        text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
-                                    }
-                                    tempHtml += text.replace(this.insertErgex, (_, index) => {return fields[parseInt(index)]}) + '\n';
-                                }
-                                return tempHtml;
-                            } else {
-                                const sections: Array<Record<string, any>> = await maria.getTableContents(insertArgs[0], insertArgs[1].split(','));
-                                for (let s of sections) {
-                                    const value = s[insertArgs[1]];
-                                    tempHtml += argparts[0].replaceAll("{{_}}", value);
-                                }
-                                return tempHtml;
-                            }
-                        }
-                        break;
-                    case "count":
-                        break;
-                    case "search":
-                        const maria2 = new db;
-                        const searchArgs: string[] = argparts[2].split("?");
-                        const queryArgs: string[] = this.urlComponents[this.urlComponents.length-1].split('=');
-                        let tmpHtml: string = "";
-
-                        const searchTable: string = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
-                        const searchPrompt: string = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
-
-                        let results: Record<string, any>[];
                         try {
-                            results = await maria2.searchTable(searchTable, searchPrompt, new Set<string>);
+                            return await this.insertFromDatabase(argparts);
                         } catch (error) {
-                            console.warn(`Failed to search for ${searchPrompt} in ${searchTable}.\n${error}`);
-                            let text: string = argparts[0];
-                            tmpHtml += text.replace(this.insertErgex, `<h2>No search results!</h2>`)
+                            console.error(error);
                             break;
                         }
-
-                        console.log(`\nSearching in ${searchTable} for '${searchPrompt}'.`);
-
-                        for (const r of results) {
-                            const fields: string[] = Object.values(r);
-                            let text: string = argparts[0];
-                            if (text.includes("[[mime-thumbnail]]")) {
-                                        const thumbnail: string = this.selectMediaTypeThumbnail(fields[2]);
-                                        text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
-                                    }
-                            tmpHtml += text.replace(this.insertErgex, (_, index) => {return fields[parseInt(index)]}) + '\n';
+                    case "count":
+                        // Maybe add to this later :P
+                        break;
+                    case "search":
+                        try {
+                            return await this.searchDatabase(argparts);
+                        } catch (error) {
+                            break;
                         }
-                        return tmpHtml;
-                }
-                // console.log(argparts)
-                break;
+                } break;
             default:
                 console.error(`Command ${command} not found.`);
                 break;
         }
         return "";
+    }
+
+    private async insertFromDatabase(argparts: string[]): Promise<string> {
+        const maria = new db;                                   // [table name] => [select statement]
+        const insertArgs: string[] = argparts[2].split("=>");
+        let tempHtml: string = "";
+        let table: string = (insertArgs[0] === '[[url]]') ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
+        
+        if (!await maria.tableExists(table)) {
+            throw new ReferenceError(`The specified table '${table}' doesn't exist!`);
+        }
+        var columns: Array<Record<string, any>>
+        if (insertArgs[1] !== '*') {
+            console.log("Selecting * from table!!!");
+            columns = await maria.getTableContents(table, ['*']);
+        } else {
+            columns = await maria.getTableContents(table, insertArgs[1].split(','));
+        }
+        let text: string = argparts[0];
+
+        return tempHtml += this.setMimeThumbnails(columns, argparts);
+    }
+
+    private async searchDatabase (argparts: string[]): Promise<string> {
+        const maria = new db;
+        const searchArgs: string[] = argparts[2].split("?");
+        const queryArgs: string[] = this.urlComponents[this.urlComponents.length-1].split('=');
+        let tmpHtml: string = "";
+
+        const searchTable: string = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
+        const searchPrompt: string = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
+
+        let results: Record<string, any>[];
+        try {
+            results = await maria.searchTable(searchTable, searchPrompt, new Set<string>);
+        } catch (error) {
+            console.warn(`Failed to search for ${searchPrompt} in ${searchTable}.\n${error}`);
+            let text: string = argparts[0];
+            tmpHtml += text.replace(this.insertErgex, `<h2>No search results!</h2>`)
+            throw (error);
+        }
+
+        console.log(`\nSearching in ${searchTable} for '${searchPrompt}'.`);
+
+        return tmpHtml += this.setMimeThumbnails(results, argparts);
+    }
+
+    private setMimeThumbnails(items: Record<string, any>[], argparts: string[]): string {
+        let tmpString: string = '';
+        for (const i of items) {
+            const fields: string[] = Object.values(i);
+            let text: string = argparts[0];
+            if (text.includes("[[mime-thumbnail]]")) {
+                const thumbnail: string = this.selectMediaTypeThumbnail(fields[2]);
+                text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
+            }
+            tmpString += text.replace(this.insertErgex, (_, index) => {return fields[parseInt(index)]}) + '\n';
+        }
+        return tmpString;
     }
 
     private selectMediaTypeThumbnail (mime: string): string {

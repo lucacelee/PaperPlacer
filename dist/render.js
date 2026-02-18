@@ -49,74 +49,82 @@ class htmlRenderer {
                 const argparts = argument.split(':'); // When asking for an insert, the argument consists of 3 parts:
                 switch (argparts[1]) { // [HTML element(s) : Desired action : Action specific argument]
                     case "db": // db — list from a database
-                        const maria = new db_1.db; // [table name] => [select statement]
-                        const insertArgs = argparts[2].split("=>");
-                        let tempHtml = "";
-                        let table = insertArgs[0] === '[[[url]]]' ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
-                        if (await maria.tableExists(table)) {
-                            if (insertArgs[1] === '*') {
-                                console.log("Selecting * from table!!!");
-                                const rows = await maria.getTableContents(table, ['*']);
-                                // console.log(Object.values(rows));
-                                for (let r of rows) {
-                                    const fields = Object.values(r);
-                                    let text = argparts[0];
-                                    if (text.includes("[[mime-thumbnail]]")) {
-                                        const thumbnail = this.selectMediaTypeThumbnail(fields[2]);
-                                        text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
-                                    }
-                                    tempHtml += text.replace(this.insertErgex, (_, index) => { return fields[parseInt(index)]; }) + '\n';
-                                }
-                                return tempHtml;
-                            }
-                            else {
-                                const sections = await maria.getTableContents(insertArgs[0], insertArgs[1].split(','));
-                                for (let s of sections) {
-                                    const value = s[insertArgs[1]];
-                                    tempHtml += argparts[0].replaceAll("{{_}}", value);
-                                }
-                                return tempHtml;
-                            }
-                        }
-                        break;
-                    case "count":
-                        break;
-                    case "search":
-                        const maria2 = new db_1.db;
-                        const searchArgs = argparts[2].split("?");
-                        const queryArgs = this.urlComponents[this.urlComponents.length - 1].split('=');
-                        let tmpHtml = "";
-                        const searchTable = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
-                        const searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
-                        let results;
                         try {
-                            results = await maria2.searchTable(searchTable, searchPrompt, new Set);
+                            return await this.insertFromDatabase(argparts);
                         }
                         catch (error) {
-                            console.warn(`Failed to search for ${searchPrompt} in ${searchTable}.\n${error}`);
-                            let text = argparts[0];
-                            tmpHtml += text.replace(this.insertErgex, `<h2>No search results!</h2>`);
+                            console.error(error);
                             break;
                         }
-                        console.log(`\nSearching in ${searchTable} for '${searchPrompt}'.`);
-                        for (const r of results) {
-                            const fields = Object.values(r);
-                            let text = argparts[0];
-                            if (text.includes("[[mime-thumbnail]]")) {
-                                const thumbnail = this.selectMediaTypeThumbnail(fields[2]);
-                                text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
-                            }
-                            tmpHtml += text.replace(this.insertErgex, (_, index) => { return fields[parseInt(index)]; }) + '\n';
+                    case "count":
+                        // Maybe add to this later :P
+                        break;
+                    case "search":
+                        try {
+                            return await this.searchDatabase(argparts);
                         }
-                        return tmpHtml;
+                        catch (error) {
+                            break;
+                        }
                 }
-                // console.log(argparts)
                 break;
             default:
                 console.error(`Command ${command} not found.`);
                 break;
         }
         return "";
+    }
+    async insertFromDatabase(argparts) {
+        const maria = new db_1.db; // [table name] => [select statement]
+        const insertArgs = argparts[2].split("=>");
+        let tempHtml = "";
+        let table = (insertArgs[0] === '[[url]]') ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
+        if (!await maria.tableExists(table)) {
+            throw new ReferenceError(`The specified table '${table}' doesn't exist!`);
+        }
+        var columns;
+        if (insertArgs[1] !== '*') {
+            console.log("Selecting * from table!!!");
+            columns = await maria.getTableContents(table, ['*']);
+        }
+        else {
+            columns = await maria.getTableContents(table, insertArgs[1].split(','));
+        }
+        let text = argparts[0];
+        return tempHtml += this.setMimeThumbnails(columns, argparts);
+    }
+    async searchDatabase(argparts) {
+        const maria = new db_1.db;
+        const searchArgs = argparts[2].split("?");
+        const queryArgs = this.urlComponents[this.urlComponents.length - 1].split('=');
+        let tmpHtml = "";
+        const searchTable = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
+        const searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
+        let results;
+        try {
+            results = await maria.searchTable(searchTable, searchPrompt, new Set);
+        }
+        catch (error) {
+            console.warn(`Failed to search for ${searchPrompt} in ${searchTable}.\n${error}`);
+            let text = argparts[0];
+            tmpHtml += text.replace(this.insertErgex, `<h2>No search results!</h2>`);
+            throw (error);
+        }
+        console.log(`\nSearching in ${searchTable} for '${searchPrompt}'.`);
+        return tmpHtml += this.setMimeThumbnails(results, argparts);
+    }
+    setMimeThumbnails(items, argparts) {
+        let tmpString = '';
+        for (const i of items) {
+            const fields = Object.values(i);
+            let text = argparts[0];
+            if (text.includes("[[mime-thumbnail]]")) {
+                const thumbnail = this.selectMediaTypeThumbnail(fields[2]);
+                text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
+            }
+            tmpString += text.replace(this.insertErgex, (_, index) => { return fields[parseInt(index)]; }) + '\n';
+        }
+        return tmpString;
     }
     selectMediaTypeThumbnail(mime) {
         switch (mime) {
