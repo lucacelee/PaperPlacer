@@ -99,7 +99,8 @@ class db {
             }
         }
         const sortedRequest = request.sort((n1, n2) => n2.relevance - n1.relevance);
-        return sortedRequest;
+        const relevantResults = sortedRequest.filter((result) => result.relevance > 0);
+        return relevantResults;
     }
 }
 exports.db = db;

@@ -102,6 +102,7 @@ export class db {
             }
         }
         const sortedRequest: Array<Record<string, any>> = request.sort((n1, n2) => n2.relevance - n1.relevance);
-        return sortedRequest as Array<Record<string, any>>;
+        const relevantResults = sortedRequest.filter((result) => result.relevance > 0);
+        return relevantResults as Array<Record<string, any>>;
     }
 }
