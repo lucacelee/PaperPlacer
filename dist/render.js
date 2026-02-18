@@ -116,7 +116,7 @@ class htmlRenderer {
         let tmpHtml = "";
         console.log(`QUERY ARGUMENTS: ${queryArgs}`);
         this.searchTable = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
-        this.searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
+        this.searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1].replaceAll('+', ' ')) : searchArgs[1];
         let results;
         try {
             results = await maria.searchTable(this.searchTable, this.searchPrompt, new Set);
