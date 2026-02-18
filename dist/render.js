@@ -90,7 +90,7 @@ class htmlRenderer {
                         const searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
                         let results;
                         try {
-                            results = await maria2.searchTable(searchTable, searchPrompt);
+                            results = await maria2.searchTable(searchTable, searchPrompt, new Set);
                         }
                         catch (error) {
                             console.warn(`Failed to search for ${searchPrompt} in ${searchTable}.\n${error}`);

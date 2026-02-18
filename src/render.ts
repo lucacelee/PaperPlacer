@@ -84,7 +84,7 @@ export class htmlRenderer{
 
                         let results: Record<string, any>[];
                         try {
-                            results = await maria2.searchTable(searchTable, searchPrompt);
+                            results = await maria2.searchTable(searchTable, searchPrompt, new Set<string>);
                         } catch (error) {
                             console.warn(`Failed to search for ${searchPrompt} in ${searchTable}.\n${error}`);
                             let text: string = argparts[0];

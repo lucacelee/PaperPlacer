@@ -87,17 +87,21 @@ export class db {
         return request as Array<Record<string, any>>;
     }
 
-    public async searchTable (table: string, prompt: string): Promise<Array<Record<string, any>>> {
+    public async searchTable (table: string, prompt: string, visited: Set<string>): Promise<Array<Record<string, any>>> {
+        if (visited.has(table)) return [];
+        visited.add(table);
+
         let request: Array<Record<string, any>> = await db.pool.query(`SELECT *, MATCH (name, transcript) AGAINST (${db.pool.escape(prompt)}) AS relevance FROM ${db.pool.escapeId(table)} ORDER BY relevance DESC;`);
         const internalCategories: Array<Record<string, any>> = Object.values(await db.pool.query(`SELECT url FROM ${db.pool.escapeId(table)} WHERE iscategory = true`));
         for (let category of internalCategories) {
             try {
-                const extraResults: Array<Record<string, any>> = await this.searchTable(category.url, prompt);
+                const extraResults: Array<Record<string, any>> = await this.searchTable(category.url, prompt, visited);
                 request = request.concat(extraResults);
             } catch (error) {
                 console.log(`An error occurred while searching:\n${error}`);
             }
         }
-        return request as Array<Record<string, any>>;
+        const sortedRequest: Array<Record<string, any>> = request.sort((n1, n2) => n2.relevance - n1.relevance);
+        return sortedRequest as Array<Record<string, any>>;
     }
 }
