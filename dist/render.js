@@ -14,6 +14,12 @@ class htmlRenderer {
         this.insertErgex = /\{\{(\d)\}\}/g;
         this.searchErgex = /\?search=(.+)/;
         this.urlComponents = [];
+        this.substitutionPending = false;
+        this.substitutionArguments = [];
+        this.searchPrompt = '';
+        this.searchTable = '';
+        this.searchUrl = '';
+        this.insertTable = '';
     }
     async renderHtml(page) {
         let html = fs_1.default.readFileSync(node_path_1.default.join(this.templatesPath, page), 'utf8');
@@ -33,6 +39,11 @@ class htmlRenderer {
             html = html.replace(thestring, await this.processTags(command, argument));
             htmlRenderer.recursionCycles = 0;
         }
+        if (this.substitutionPending) {
+            for (let a of this.substitutionArguments) {
+                html = html.replace(`<--!%substitute="${a}"%-->`, this.substituteValuesGeneratedDuringInsertion(a));
+            }
+        }
         return html;
     }
     async processTags(command, argument) {
@@ -45,37 +56,41 @@ class htmlRenderer {
                     return await this.loopRegex(fs_1.default.readFileSync(filepath, 'utf8'));
                 else
                     return `Error: file '${argument}' could not be found!`;
-            case "insert": // Used to insert new HTML tags into the document
-                const argparts = argument.split(':'); // When asking for an insert, the argument consists of 3 parts:
-                switch (argparts[1]) { // [HTML element(s) : Desired action : Action specific argument]
-                    case "db": // db — list from a database
-                        try {
-                            return await this.insertFromDatabase(argparts);
-                        }
-                        catch (error) {
-                            console.error(error);
-                            break;
-                        }
-                    case "count":
-                        // Maybe add to this later :P
-                        break;
-                    case "search":
-                        try {
-                            return await this.searchDatabase(argparts);
-                        }
-                        catch (error) {
-                            break;
-                        }
-                }
-                break;
+            case "insert":
+                return await this.insertHtml(argument);
+            case "substitute":
+                this.substitutionPending = true;
+                this.substitutionArguments.push(argument);
+                return `<--!%substitute="${argument}"%-->`;
             default:
                 console.error(`Command ${command} not found.`);
                 break;
         }
         return "";
     }
+    async insertHtml(argument) {
+        let output = ''; // When asking for an insert, the argument consists of 3 parts:
+        const argparts = argument.split(':'); // [HTML element(s) : Desired action : Action specific argument]
+        switch (argparts[1]) {
+            case "db": // db — list from a database
+                try {
+                    output += await this.insertFromDatabase(argparts);
+                }
+                catch (error) {
+                    console.warn(error);
+                    break;
+                }
+            case "count":
+                // Maybe add to this later :P
+                break;
+            case "search":
+                output += await this.searchDatabase(argparts);
+                break;
+        }
+        return output;
+    }
     async insertFromDatabase(argparts) {
-        const maria = new db_1.db; // [table name] => [select statement]
+        const maria = new db_1.db;
         const insertArgs = argparts[2].split("=>");
         let tempHtml = "";
         let table = (insertArgs[0] === '[[url]]') ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
@@ -91,27 +106,33 @@ class htmlRenderer {
             columns = await maria.getTableContents(table, insertArgs[1].split(','));
         }
         let text = argparts[0];
-        return tempHtml += this.setMimeThumbnails(columns, argparts);
+        tempHtml += this.setMimeThumbnails(columns, argparts);
+        return tempHtml;
     }
     async searchDatabase(argparts) {
         const maria = new db_1.db;
         const searchArgs = argparts[2].split("?");
-        const queryArgs = this.urlComponents[this.urlComponents.length - 1].split('=');
+        const queryArgs = this.urlComponents.slice(2).join('/').split('=');
         let tmpHtml = "";
-        const searchTable = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
-        const searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
+        console.log(`QUERY ARGUMENTS: ${queryArgs}`);
+        this.searchTable = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
+        this.searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1]) : searchArgs[1];
         let results;
         try {
-            results = await maria.searchTable(searchTable, searchPrompt, new Set);
+            results = await maria.searchTable(this.searchTable, this.searchPrompt, new Set);
         }
         catch (error) {
-            console.warn(`Failed to search for ${searchPrompt} in ${searchTable}.\n${error}`);
+            console.warn(`Failed to search for ${this.searchPrompt} in ${this.searchTable}.\n${error}`);
             let text = argparts[0];
             tmpHtml += text.replace(this.insertErgex, `<h2>No search results!</h2>`);
-            throw (error);
+            results = [];
         }
-        console.log(`\nSearching in ${searchTable} for '${searchPrompt}'.`);
-        return tmpHtml += this.setMimeThumbnails(results, argparts);
+        console.log(`\nSearching in ${this.searchTable} for '${this.searchPrompt}'.`);
+        if (results.length == 0) {
+            tmpHtml += "<h2>No search results!</h2>";
+        }
+        tmpHtml += this.setMimeThumbnails(results, argparts);
+        return tmpHtml;
     }
     setMimeThumbnails(items, argparts) {
         let tmpString = '';
@@ -125,6 +146,12 @@ class htmlRenderer {
             tmpString += text.replace(this.insertErgex, (_, index) => { return fields[parseInt(index)]; }) + '\n';
         }
         return tmpString;
+    }
+    substituteValuesGeneratedDuringInsertion(original) {
+        const revamped = original.replaceAll("[[url]]", this.searchTable)
+            .replaceAll("[[query]]", this.searchPrompt)
+            .replaceAll("[[table]]", this.insertTable);
+        return revamped;
     }
     selectMediaTypeThumbnail(mime) {
         switch (mime) {
