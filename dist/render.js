@@ -98,6 +98,7 @@ class htmlRenderer {
         const insertArgs = argparts[2].split("=>");
         let tempHtml = "";
         let table = (insertArgs[0] === '[[url]]') ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
+        this.insertTable = table;
         if (!await maria.tableExists(table)) {
             throw new ReferenceError(`The specified table '${table}' doesn't exist!`);
         }
