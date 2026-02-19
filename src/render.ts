@@ -116,21 +116,23 @@ export class htmlRenderer{
     private async searchDatabase (argparts: string[]): Promise<string> {
         const maria = new db;
         const searchArgs: string[] = argparts[2].split("?");
-        const queryArgs: string[] = this.urlComponents.slice(2).join('/').split('=');
+        const queryArgs: string[] = (this.urlComponents.length == 2) ? this.urlComponents[1].split('=') : this.urlComponents.slice(2).join('/').split('=');
         let tmpHtml: string = "";
 
         console.log(`QUERY ARGUMENTS: ${queryArgs}`)
         this.searchTable = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
         this.searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1].replaceAll('+', ' ')) : searchArgs[1];
 
-        let results: Record<string, any>[];
-        try {
-            results = await maria.searchTable(this.searchTable, this.searchPrompt, new Set<string>);
-        } catch (error) {
-            console.warn(`Failed to search for ${this.searchPrompt} in ${this.searchTable}.\n${error}`);
-            let text: string = argparts[0];
-            tmpHtml += text.replace(this.insertErgex, `<h2>No search results!</h2>`)
-            results = [];
+        let results: Record<string, any>[] = [];
+        if (this.searchTable == "") {
+            const tables = await maria.getTableContents('ppindex', ['section']);
+            for (let t of tables) {
+                this.searchTable = t.section;
+                results = results.concat(await this.cueSearch(maria));
+            }
+            this.searchTable = "/";
+        } else {
+            results = await this.cueSearch(maria)
         }
 
         console.log(`\nSearching in ${this.searchTable} for '${this.searchPrompt}'.`);
@@ -141,6 +143,17 @@ export class htmlRenderer{
 
         tmpHtml += this.setMimeThumbnails(results, argparts);
         return tmpHtml;
+    }
+
+    private async cueSearch (maria: db): Promise<Record<string, any>[]> {
+        let results: Record<string, any>[];
+        try {
+            results = await maria.searchTable(this.searchTable, this.searchPrompt, new Set<string>);
+        } catch (error) {
+            console.warn(`Failed to search for ${this.searchPrompt} in ${this.searchTable}.\n${error}`);
+            results = [];
+        }
+        return results;
     }
 
     private setMimeThumbnails(items: Record<string, any>[], argparts: string[]): string {

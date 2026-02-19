@@ -117,20 +117,22 @@ class htmlRenderer {
     async searchDatabase(argparts) {
         const maria = new db_1.db;
         const searchArgs = argparts[2].split("?");
-        const queryArgs = this.urlComponents.slice(2).join('/').split('=');
+        const queryArgs = (this.urlComponents.length == 2) ? this.urlComponents[1].split('=') : this.urlComponents.slice(2).join('/').split('=');
         let tmpHtml = "";
         console.log(`QUERY ARGUMENTS: ${queryArgs}`);
         this.searchTable = (searchArgs[0] == "[[url]]") ? decodeURIComponent(queryArgs[0]).replace('?search', '') : searchArgs[0];
         this.searchPrompt = (searchArgs[1] == "[[query]]") ? decodeURIComponent(queryArgs[1].replaceAll('+', ' ')) : searchArgs[1];
-        let results;
-        try {
-            results = await maria.searchTable(this.searchTable, this.searchPrompt, new Set);
+        let results = [];
+        if (this.searchTable == "") {
+            const tables = await maria.getTableContents('ppindex', ['section']);
+            for (let t of tables) {
+                this.searchTable = t.section;
+                results = results.concat(await this.cueSearch(maria));
+            }
+            this.searchTable = "/";
         }
-        catch (error) {
-            console.warn(`Failed to search for ${this.searchPrompt} in ${this.searchTable}.\n${error}`);
-            let text = argparts[0];
-            tmpHtml += text.replace(this.insertErgex, `<h2>No search results!</h2>`);
-            results = [];
+        else {
+            results = await this.cueSearch(maria);
         }
         console.log(`\nSearching in ${this.searchTable} for '${this.searchPrompt}'.`);
         if (results.length == 0) {
@@ -138,6 +140,17 @@ class htmlRenderer {
         }
         tmpHtml += this.setMimeThumbnails(results, argparts);
         return tmpHtml;
+    }
+    async cueSearch(maria) {
+        let results;
+        try {
+            results = await maria.searchTable(this.searchTable, this.searchPrompt, new Set);
+        }
+        catch (error) {
+            console.warn(`Failed to search for ${this.searchPrompt} in ${this.searchTable}.\n${error}`);
+            results = [];
+        }
+        return results;
     }
     setMimeThumbnails(items, argparts) {
         let tmpString = '';

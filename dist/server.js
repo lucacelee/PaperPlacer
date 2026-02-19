@@ -24,6 +24,12 @@ function serve() {
         renderer.urlComponents = urlStrings = request.url.split('/');
         const htmlName = urlStrings[1] + ".html";
         let filepath = (0, node_path_1.join)(__dirname, "templates", htmlName);
+        if (searchErgex.test(request.url)) {
+            console.log('Someone is searching something!');
+            response.writeHead(200);
+            response.end(await renderer.renderHtml("search.html"));
+            return;
+        }
         if (!(0, fs_1.existsSync)(filepath) && request.url != '/') {
             response.writeHead(404);
             response.end(`404: Not found!`);
@@ -49,22 +55,15 @@ function serve() {
                     response.end(await renderer.renderHtml("upload_successfull.html"));
                 }
             });
+            return;
         }
-        else if (request.url == "/") {
+        if (request.url == "/") {
             response.writeHead(200);
             response.end(await renderer.renderHtml("index.html"));
+            return;
         }
-        else {
-            if (searchErgex.test(request.url)) {
-                console.log('Someone is searching something!');
-                response.writeHead(200);
-                response.end(await renderer.renderHtml("search.html"));
-            }
-            else {
-                response.writeHead(200);
-                response.end(await renderer.renderHtml(htmlName));
-            }
-        }
+        response.writeHead(200);
+        response.end(await renderer.renderHtml(htmlName));
     });
     server.listen(3000);
 }
