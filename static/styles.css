@@ -27,8 +27,15 @@ header {
     padding: 1.5rem;
 }
 
-header > a {
+header > #upload_button {
     text-decoration: none;
+    margin: 0 0 0 1rem;
+}
+
+header > a > img {
+    height: 3rem;
+    margin-right: 2rem;
+    margin-left: 0;
 }
 
 footer {
@@ -42,7 +49,7 @@ footer > p > a {
 }
 
 form {
-    width: 40em;
+    width: 33em;
     margin-right: auto;
 }
 
