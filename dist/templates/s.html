@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-    <title>Section</title>
+    <title><!--%substitute="[[table]]"%--></title>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="/styles.css">
 </head>
@@ -10,6 +10,7 @@
         <div class="flex">
             <!--%include="sidebar.html"%-->
             <div id="main">
+                <!--%substitute="<div class="search_query"><h2><a href="[[table]]">[[table]]</a></h2></div>"%-->
                 <div id="section_grid">
                     <!--%insert="<div class="section_element"><a href="{{3}}"><div class="section_image"><img src="[[mime-thumbnail]]"></img></div><div class="section_label">{{1}}</div></a></div>:db:[[url]]=>*"%-->
                 </div>

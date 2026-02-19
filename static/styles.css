@@ -184,6 +184,7 @@ input[type="search"] {
 
 .search_query a {
     color: brown;
+    text-decoration: none;
 }
 
 .search_image {
