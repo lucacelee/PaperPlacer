@@ -4,7 +4,7 @@ import { IncomingMessage, ServerResponse } from "node:http";
 
 export function loadStatic (request: IncomingMessage, response: ServerResponse): Boolean {
     if (!request.url) return false;
-    let filepath:string = path.join(__dirname, "../static", request.url);
+    let filepath:string = path.join(__dirname, "../static", decodeURIComponent(request.url));
     if (!fs.existsSync(filepath)) return false;
     var type:string;
     switch (path.extname(filepath)) {

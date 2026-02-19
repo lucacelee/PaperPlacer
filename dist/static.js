@@ -9,7 +9,7 @@ const fs_1 = __importDefault(require("fs"));
 function loadStatic(request, response) {
     if (!request.url)
         return false;
-    let filepath = node_path_1.default.join(__dirname, "../static", request.url);
+    let filepath = node_path_1.default.join(__dirname, "../static", decodeURIComponent(request.url));
     if (!fs_1.default.existsSync(filepath))
         return false;
     var type;
