@@ -41,7 +41,11 @@ class htmlRenderer {
         }
         if (this.substitutionPending) {
             for (let a of this.substitutionArguments) {
-                html = html.replace(`<--!%substitute="${a}"%-->`, this.substituteValuesGeneratedDuringInsertion(a));
+                html = html.replace(`<--!%substitute="${a}"%-->`, () => {
+                    return a.replaceAll("[[url]]", this.searchTable)
+                        .replaceAll("[[query]]", this.searchPrompt)
+                        .replaceAll("[[table]]", this.insertTable);
+                });
             }
         }
         return html;
@@ -146,12 +150,6 @@ class htmlRenderer {
             tmpString += text.replace(this.insertErgex, (_, index) => { return fields[parseInt(index)]; }) + '\n';
         }
         return tmpString;
-    }
-    substituteValuesGeneratedDuringInsertion(original) {
-        const revamped = original.replaceAll("[[url]]", this.searchTable)
-            .replaceAll("[[query]]", this.searchPrompt)
-            .replaceAll("[[table]]", this.insertTable);
-        return revamped;
     }
     selectMediaTypeThumbnail(mime) {
         switch (mime) {
