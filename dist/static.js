@@ -35,6 +35,9 @@ function loadStatic(request, response) {
         case ".webp":
             type = "image/webp";
             break;
+        case ".ico":
+            type = "image/ico";
+            break;
         case "":
             return false;
         default:

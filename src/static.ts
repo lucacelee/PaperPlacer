@@ -29,6 +29,9 @@ export function loadStatic (request: IncomingMessage, response: ServerResponse):
         case ".webp":
             type = "image/webp";
             break;
+        case ".ico":
+            type = "image/ico";
+            break;
         case "":
             return false;
         default:
