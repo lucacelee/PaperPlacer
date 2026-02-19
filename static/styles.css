@@ -69,8 +69,7 @@ input[type="search"] {
 
 .flex {
     display: flex;
-    min-height: 40rem;
-    max-height: 51.4rem;
+    height: 50rem;
     flex-direction: row;
 }
 
