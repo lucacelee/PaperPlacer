@@ -1,6 +1,7 @@
 body {
     background-image: url("wood2.jpg");
     background-size: cover;
+    background-color: tan;
     font-family: Georgia, 'Times New Roman', Times, serif;
     padding-top: 1rem;
 }
