@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-    <title>Upload to PaperPlacer</title>
+    <title>Remove a category — PaperPlacer</title>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -10,8 +10,9 @@
         <div class="flex">
             <!--%include="sidebar.html"%-->
             <div id="main">
-                <form method="post" enctype="multipart/form-data">
-                    <input type="file" name="fileUpload">
+                <form method="post" enctype="application/x-www-form-urlencoded">
+                    <input type="text" name="tablename" placeholder="Catalogue Path" autocomplete="off" autofocus="" required/>
+                    <input type="password" name="password" placeholder="Administrator Password" autocomplete="off" autofocus="" required/>
                     <input type="submit" value="Upload">
                 </form>
                 <!--%include="admin.html"%-->
