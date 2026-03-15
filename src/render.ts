@@ -52,7 +52,8 @@ export class htmlRenderer{
         if (htmlRenderer.recursionCycles > 500) return "";
         switch (command) {
             case "include":         // Used to include contents of another HTML file, in order to reuse them
-                const filepath: string = path.join(this.templatesPath, argument);
+                if (argument == "admin.html" && !db.requireAdminPasswordToUpload) return "";    // admin.html contains the admin password form,
+                const filepath: string = path.join(this.templatesPath, argument);               // so it's only needed when the password is required
                 if (fs.existsSync(filepath)) return await this.loopRegex(fs.readFileSync(filepath, 'utf8'));
                 else return `Error: file '${argument}' could not be found!`;
             case "insert":

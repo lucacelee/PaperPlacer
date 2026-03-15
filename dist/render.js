@@ -55,7 +55,9 @@ class htmlRenderer {
             return "";
         switch (command) {
             case "include": // Used to include contents of another HTML file, in order to reuse them
-                const filepath = node_path_1.default.join(this.templatesPath, argument);
+                if (argument == "admin.html" && !db_1.db.requireAdminPasswordToUpload)
+                    return ""; // admin.html contains the admin password form,
+                const filepath = node_path_1.default.join(this.templatesPath, argument); // so it's only needed when the password is required
                 if (fs_1.default.existsSync(filepath))
                     return await this.loopRegex(fs_1.default.readFileSync(filepath, 'utf8'));
                 else
