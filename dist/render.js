@@ -128,8 +128,8 @@ class htmlRenderer {
             for (let t of tables) {
                 this.searchTable = t.section;
                 results = results.concat(await this.cueSearch(maria));
-                results = results.sort((n1, n2) => n2.relevance - n1.relevance);
             }
+            results = results.sort((n1, n2) => n2.relevance - n1.relevance);
             this.searchTable = "/";
         }
         else {
