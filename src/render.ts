@@ -170,8 +170,9 @@ export class htmlRenderer{
             tmpString += text.replace(this.insertErgex, (_, index) => {
                 const n: number = parseInt(index);
                 const replacement = fields[n];
+                const protocol: RegExp = /^[A-Za-z\d-]+\:\/\//;
 
-                if ( n == 3   &&   !( replacement.startsWith('http://') || replacement.startsWith('https://') ) ) {
+                if ( n == 3  &&  !protocol.test(replacement) ) {
                     return '/s/' + replacement;
                 }
                 return replacement;
