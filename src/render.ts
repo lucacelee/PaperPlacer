@@ -167,7 +167,15 @@ export class htmlRenderer{
                 const thumbnail: string = this.selectMediaTypeThumbnail(fields[2]);
                 text = text.replaceAll("[[mime-thumbnail]]", thumbnail);
             }
-            tmpString += text.replace(this.insertErgex, (_, index) => {return fields[parseInt(index)]}) + '\n';
+            tmpString += text.replace(this.insertErgex, (_, index) => {
+                const n: number = parseInt(index);
+                const replacement = fields[n];
+
+                if ( n == 3   &&   !( replacement.startsWith('http://') || replacement.startsWith('https://') ) ) {
+                    return '/s/' + replacement;
+                }
+                return replacement;
+            }) + '\n';
         }
         return tmpString;
     }
