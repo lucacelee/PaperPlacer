@@ -57,7 +57,7 @@ class db {
             this.dropList.forEach(async (o) => {
                 console.log(`'${o}' is subject for removal!`);
                 if (await this.tableExistsTransactionally(conn, o))
-                    this.dropTable(o, conn);
+                    await this.dropTable(o, conn);
             });
             if (isRootTable)
                 conn.query(`DELETE FROM ppindex WHERE section = ?`, [r.tablename]);
@@ -65,7 +65,7 @@ class db {
                 const parentTable = r.tablename.split('/')
                     .slice(0, -1)
                     .join('/');
-                conn.query(`DELETE from ${conn.escapeId(parentTable)} WHERE url = ?`, [r.tablename]);
+                await conn.query(`DELETE from ${conn.escapeId(parentTable)} WHERE url = ?`, [r.tablename]);
             }
             await conn.commit();
             success = true;
@@ -81,14 +81,21 @@ class db {
         return success;
     }
     async dropTable(table, conn) {
-        const internalCategories = await conn.query(`SELECT url FROM ${conn.escapeId(table)} WHERE iscategory = true;`);
+        let internalCategories;
+        try {
+            internalCategories = await conn.query(`SELECT url FROM ${conn.escapeId(table)} WHERE iscategory = true;`);
+        }
+        catch (error) {
+            console.error(`Couldn't retrieve categories located in ${table}: ${error.message}`);
+            internalCategories = [];
+        }
         for (let i of internalCategories) {
             if (!await this.tableExistsTransactionally(conn, i.url))
                 continue;
             this.dropTable(i.url, conn);
             this.dropList.push(i.url);
         }
-        conn.query(`DROP TABLE IF EXISTS /*Admin-issued removal*/ ${conn.escapeId(table)}`);
+        await conn.query(`DROP TABLE IF EXISTS /*Admin-issued removal*/ ${conn.escapeId(table)}`);
     }
     async tableExists(table) {
         const rows = await db.pool.query(`SHOW TABLES LIKE ?`, [table]);

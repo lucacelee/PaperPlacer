@@ -63,7 +63,7 @@ export class db {
 
             this.dropList.forEach(async (o) => {
                 console.log(`'${o}' is subject for removal!`);
-                if (await this.tableExistsTransactionally(conn, o)) this.dropTable(o, conn);
+                if (await this.tableExistsTransactionally(conn, o)) await this.dropTable(o, conn);
             });
 
             if (isRootTable) conn.query(`DELETE FROM ppindex WHERE section = ?`, [r.tablename]);
@@ -71,7 +71,7 @@ export class db {
                 const parentTable: string = r.tablename.split('/')
                                                        .slice(0, -1)
                                                        .join('/');
-                conn.query(`DELETE from ${conn.escapeId(parentTable)} WHERE url = ?`, [r.tablename]);
+                await conn.query(`DELETE from ${conn.escapeId(parentTable)} WHERE url = ?`, [r.tablename]);
             }
 
             await conn.commit();
@@ -87,13 +87,20 @@ export class db {
     }
 
     private async dropTable (table: string, conn: mariadb.PoolConnection) {
-        const internalCategories: Record<string, any>[] = await conn.query(`SELECT url FROM ${conn.escapeId(table)} WHERE iscategory = true;`);
+        let internalCategories: Record<string, any>[];
+        try {
+            internalCategories = await conn.query(`SELECT url FROM ${conn.escapeId(table)} WHERE iscategory = true;`);
+        } catch (error: any) {
+            console.error(`Couldn't retrieve categories located in ${table}: ${error.message}`);
+            internalCategories = [];
+        }
+        
         for (let i of internalCategories) {
             if (!await this.tableExistsTransactionally(conn, i.url)) continue;
             this.dropTable(i.url, conn);
             this.dropList.push(i.url);
         }
-        conn.query(`DROP TABLE IF EXISTS /*Admin-issued removal*/ ${conn.escapeId(table)}`);
+        await conn.query(`DROP TABLE IF EXISTS /*Admin-issued removal*/ ${conn.escapeId(table)}`);
     }
 
     public async tableExists (table: string): Promise<boolean> {
