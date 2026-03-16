@@ -12,6 +12,10 @@ export class db {
     });
 
     public static windowsModeCategoryHandling: boolean = false;
+    private static adminPassword: string = process.env.PP_ADMIN_PASSWORD ?? "";
+    public static requireAdminPasswordToUpload: boolean = process.env.PP_REQUIRE_ADMIN_PASSWORD_TO_UPLOAD_FILES == "true";
+
+    private dropList: string[] = [];
 
     public async setup () {
         let table = await db.pool.query("CREATE TABLE IF NOT EXISTS ppindex (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, section TINYTEXT CHARACTER SET utf8 NOT NULL);");
@@ -42,10 +46,61 @@ export class db {
         }
     }
 
+    public async removeCategory (r: Record<string, any>): Promise<boolean> {
+        if (r.tablename == null || r.password == null) return false;
+        if (r.password !== db.adminPassword) return false;
+        if (!await this.tableExists(r.tablename)) return false;
+
+        const conn = await db.pool.getConnection();
+        console.warn(`REMOVING '${r.tablename}' !!!`);
+
+        let success: boolean;
+        try {
+            await conn.beginTransaction();
+            const isRootTable: boolean = await this.rowExistsTransactionally(conn, "ppindex", r.tablename);
+
+            await this.dropTable(r.tablename, conn);
+
+            this.dropList.forEach(async (o) => {
+                console.log(`'${o}' is subject for removal!`);
+                if (await this.tableExistsTransactionally(conn, o)) this.dropTable(o, conn);
+            });
+
+            if (isRootTable) conn.query(`DELETE FROM ppindex WHERE section = ?`, [r.tablename]);
+            else {
+                const parentTable: string = r.tablename.split('/')
+                                                       .slice(0, -1)
+                                                       .join('/');
+                conn.query(`DELETE from ${conn.escapeId(parentTable)} WHERE url = ?`, [r.tablename]);
+            }
+
+            await conn.commit();
+            success = true;
+        } catch (error) {
+            await conn.rollback();
+            console.error(`Failed to remove ${r.tablename}. Error:\n${error}`);
+            success = false;
+        } finally {
+            conn.release();
+        }
+        return success;
+    }
+
+    private async dropTable (table: string, conn: mariadb.PoolConnection) {
+        const internalCategories: Record<string, any>[] = await conn.query(`SELECT url FROM ${conn.escapeId(table)} WHERE iscategory = true;`);
+        for (let i of internalCategories) {
+            if (!await this.tableExistsTransactionally(conn, i.url)) continue;
+            this.dropTable(i.url, conn);
+            this.dropList.push(i.url);
+        }
+        conn.query(`DROP TABLE IF EXISTS /*Admin-issued removal*/ ${conn.escapeId(table)}`);
+    }
+
     public async tableExists (table: string): Promise<boolean> {
-        console.log(`Does table ${table} exist?`)
         const rows = await db.pool.query(`SHOW TABLES LIKE ?`, [table]);
-        return rows.length > 0;
+        const answer: boolean = rows.length > 0;
+        console.log(`Does table ${table} exist? ${answer}`)
+        return answer;
     }
 
     private async createMissingEntries (conn: mariadb.PoolConnection, filepathComponents: string[], previouslyDefinedTables: string, csvPath: string) {
@@ -70,9 +125,10 @@ export class db {
     }
 
     private async tableExistsTransactionally (conn: mariadb.PoolConnection, table: string): Promise<boolean> {
-        console.log(`Does table ${table} exist?`)
         const rows = await conn.query(`SHOW TABLES LIKE ?`, [table]);
-        return rows.length > 0;
+        const answer: boolean = rows.length > 0;
+        console.log(`Does table ${table} exist? ${answer}`)
+        return answer;
     }
 
     private async rowExistsTransactionally (conn: mariadb.PoolConnection, table: string, row: string): Promise<boolean> {

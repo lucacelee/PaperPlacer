@@ -7,6 +7,9 @@ exports.db = void 0;
 const mariadb_1 = __importDefault(require("mariadb"));
 require("dotenv/config");
 class db {
+    constructor() {
+        this.dropList = [];
+    }
     async setup() {
         let table = await db.pool.query("CREATE TABLE IF NOT EXISTS ppindex (id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, section TINYTEXT CHARACTER SET utf8 NOT NULL);");
         console.log(table);
@@ -37,10 +40,61 @@ class db {
             conn.release();
         }
     }
+    async removeCategory(r) {
+        if (r.tablename == null || r.password == null)
+            return false;
+        if (r.password !== db.adminPassword)
+            return false;
+        if (!await this.tableExists(r.tablename))
+            return false;
+        const conn = await db.pool.getConnection();
+        console.warn(`REMOVING '${r.tablename}' !!!`);
+        let success;
+        try {
+            await conn.beginTransaction();
+            const isRootTable = await this.rowExistsTransactionally(conn, "ppindex", r.tablename);
+            await this.dropTable(r.tablename, conn);
+            this.dropList.forEach(async (o) => {
+                console.log(`'${o}' is subject for removal!`);
+                if (await this.tableExistsTransactionally(conn, o))
+                    this.dropTable(o, conn);
+            });
+            if (isRootTable)
+                conn.query(`DELETE FROM ppindex WHERE section = ?`, [r.tablename]);
+            else {
+                const parentTable = r.tablename.split('/')
+                    .slice(0, -1)
+                    .join('/');
+                conn.query(`DELETE from ${conn.escapeId(parentTable)} WHERE url = ?`, [r.tablename]);
+            }
+            await conn.commit();
+            success = true;
+        }
+        catch (error) {
+            await conn.rollback();
+            console.error(`Failed to remove ${r.tablename}. Error:\n${error}`);
+            success = false;
+        }
+        finally {
+            conn.release();
+        }
+        return success;
+    }
+    async dropTable(table, conn) {
+        const internalCategories = await conn.query(`SELECT url FROM ${conn.escapeId(table)} WHERE iscategory = true;`);
+        for (let i of internalCategories) {
+            if (!await this.tableExistsTransactionally(conn, i.url))
+                continue;
+            this.dropTable(i.url, conn);
+            this.dropList.push(i.url);
+        }
+        conn.query(`DROP TABLE IF EXISTS /*Admin-issued removal*/ ${conn.escapeId(table)}`);
+    }
     async tableExists(table) {
-        console.log(`Does table ${table} exist?`);
         const rows = await db.pool.query(`SHOW TABLES LIKE ?`, [table]);
-        return rows.length > 0;
+        const answer = rows.length > 0;
+        console.log(`Does table ${table} exist? ${answer}`);
+        return answer;
     }
     async createMissingEntries(conn, filepathComponents, previouslyDefinedTables, csvPath) {
         const component = ((previouslyDefinedTables == "") ? '' : previouslyDefinedTables + '/') + filepathComponents[0];
@@ -69,9 +123,10 @@ class db {
             }
     }
     async tableExistsTransactionally(conn, table) {
-        console.log(`Does table ${table} exist?`);
         const rows = await conn.query(`SHOW TABLES LIKE ?`, [table]);
-        return rows.length > 0;
+        const answer = rows.length > 0;
+        console.log(`Does table ${table} exist? ${answer}`);
+        return answer;
     }
     async rowExistsTransactionally(conn, table, row) {
         const rows = (table == 'ppindex') ? await conn.query(`SELECT section FROM ${conn.escapeId(table)} WHERE section = ?`, [row]) : await conn.query(`SELECT name FROM ${conn.escapeId(table)} WHERE name = ?`, [row]);
@@ -113,4 +168,6 @@ db.pool = mariadb_1.default.createPool({
     trace: true // Development only!
 });
 db.windowsModeCategoryHandling = false;
+db.adminPassword = process.env.PP_ADMIN_PASSWORD ?? "";
+db.requireAdminPasswordToUpload = process.env.PP_REQUIRE_ADMIN_PASSWORD_TO_UPLOAD_FILES == "true";
 //# sourceMappingURL=db.js.map
