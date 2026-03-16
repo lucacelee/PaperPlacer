@@ -1,6 +1,5 @@
 import http, { IncomingMessage, ServerResponse } from "http";
 import { writeFileSync, existsSync, mkdirSync, rmSync } from "fs";
-import url from 'url';
 import { join } from "node:path";
 import { htmlRenderer } from "./render";
 import { loadStatic } from "./static";
@@ -31,11 +30,11 @@ export function serve () {
 
         if (!existsSync(filepath) && request.url != '/') {
             response.writeHead(404);
-            response.end(`404: Not found!`);
+            response.end(`<!DOCTYPE html><html><body><h1>HTTP 404 Not Found</h1><h2>Could not find the page you are looking for!</h2><p><a href="/">Back to the website</a></p></body></html>`);
             return;
         }
 
-        if (request.url == '/upload' && request.method == "POST") {
+        if (request.method == "POST") {
             const body: Buffer[] = [];
             
             request.on('data', (chunk: Buffer) => {
@@ -43,18 +42,7 @@ export function serve () {
             });
 
             request.on('end', async () => {
-                let success: boolean = false;
-                try {
-                    await importDownload(body);
-                    success = true;
-                } catch (error) {
-                    response.writeHead(500);
-                    response.end(`<!DOCTYPE html><html><body><h1>HTTP 500</h1><h2>Upload failed!</h2><p>${error}</p></body></html>`);
-                }
-                if (success) {
-                    response.writeHead(200);
-                    response.end(await renderer.renderHtml("upload_successfull.html"));
-                }
+                processPostRequest(request, response, body);
             });
             return;
         }
@@ -69,6 +57,51 @@ export function serve () {
         response.end(await renderer.renderHtml(htmlName));
     });
     server.listen(3000);
+}
+
+async function processPostRequest(request: http.IncomingMessage, response: http.ServerResponse, body: Buffer[]) {
+    switch (request.url) {
+        case '/upload':
+            let success: boolean = false;
+            try {
+                await importDownload(body);
+                success = true;
+            } catch (error: any) {
+                response.writeHead(500);
+                response.end(`<!DOCTYPE html><html><body><h1>HTTP 500</h1><h2>Upload failed!</h2><p>${error.message}</p></body></html>`);
+            }
+            if (success) {
+                response.writeHead(200);
+                response.end(await renderer.renderHtml("upload_successfull.html"));
+            }
+            break;
+
+        case '/delete':
+            const textBody = Buffer.concat(body).toString();
+            const textComponents: Array<string> = textBody.split('&');
+
+            const requestComponents: Record<string, any> = Object.fromEntries(textComponents.map(component => {
+                const split: string[] = component.split('=').map((c) => {
+                    return decodeURIComponent(c.replaceAll('+', ' '));      // TL;DR: these come as 'abd=def&uvw=xyz', so we split
+                });                                                         // by '&' first, and then by '=', and then clean up the
+                return [split[0], split[1]];                                // URI encoding to get the strings and turn them into
+            }));                                                            // a record like {abc: "def", uvw: "xyz"}.
+                                                                            // Might reuse this in the future, hence it's so general.
+            const maria = new db;
+            const removed: boolean = await maria.removeCategory(requestComponents);
+
+            if (removed) {
+                response.writeHead(200);
+                response.end(await renderer.renderHtml("delete_successful.html"));
+            } else {
+                response.writeHead(200);
+                response.end(await renderer.renderHtml("deletion_failed.html"));
+            }
+            break;
+        default:
+            response.writeHead(501);
+            response.end(`<!DOCTYPE html><html><body><h1>HTTP 501 Not Implemented</h1><h2>Could not process this POST request!</h2><p>${request.url}</p></body></html>`);
+    }
 }
 
 async function importDownload (body: Buffer[]) {
