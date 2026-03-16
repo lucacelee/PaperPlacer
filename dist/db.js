@@ -43,6 +43,8 @@ class db {
     async removeCategory(r) {
         if (r.tablename == null || r.password == null)
             return false;
+        if (r.tablename == 'ppindex')
+            return false;
         if (r.password !== db.adminPassword)
             return false;
         if (!await this.tableExists(r.tablename))
@@ -54,11 +56,11 @@ class db {
             await conn.beginTransaction();
             const isRootTable = await this.rowExistsTransactionally(conn, "ppindex", r.tablename);
             await this.dropTable(r.tablename, conn);
-            this.dropList.forEach(async (o) => {
+            for (let o of this.dropList) {
                 console.log(`'${o}' is subject for removal!`);
                 if (await this.tableExistsTransactionally(conn, o))
                     await this.dropTable(o, conn);
-            });
+            }
             if (isRootTable)
                 conn.query(`DELETE FROM ppindex WHERE section = ?`, [r.tablename]);
             else {
@@ -92,7 +94,7 @@ class db {
         for (let i of internalCategories) {
             if (!await this.tableExistsTransactionally(conn, i.url))
                 continue;
-            this.dropTable(i.url, conn);
+            await this.dropTable(i.url, conn);
             this.dropList.push(i.url);
         }
         await conn.query(`DROP TABLE IF EXISTS /*Admin-issued removal*/ ${conn.escapeId(table)}`);
