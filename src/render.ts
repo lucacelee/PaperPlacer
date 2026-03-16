@@ -31,7 +31,6 @@ export class htmlRenderer{
             const argument:string | undefined = m.groups?.argument;
             if (command == null || argument == null) break;
             const thestring:string = m[0];
-            console.log(`\nMatch found: ${thestring}.\nCommand: '${command}', argument: '${argument}'\n`)
             html = html.replace(thestring, await this.processTags(command, argument))
             htmlRenderer.recursionCycles = 0;
         }
@@ -76,8 +75,8 @@ export class htmlRenderer{
             case "db":                              // db — list from a database
                 try {
                     output += await this.insertFromDatabase(argparts);
-                } catch (error) {
-                    console.warn(error);
+                } catch (error: any) {
+                    console.warn(error.message);
                     break;
                 }
             case "count":

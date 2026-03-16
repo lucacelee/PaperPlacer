@@ -35,7 +35,6 @@ class htmlRenderer {
             if (command == null || argument == null)
                 break;
             const thestring = m[0];
-            console.log(`\nMatch found: ${thestring}.\nCommand: '${command}', argument: '${argument}'\n`);
             html = html.replace(thestring, await this.processTags(command, argument));
             htmlRenderer.recursionCycles = 0;
         }
@@ -83,7 +82,7 @@ class htmlRenderer {
                     output += await this.insertFromDatabase(argparts);
                 }
                 catch (error) {
-                    console.warn(error);
+                    console.warn(error.message);
                     break;
                 }
             case "count":
