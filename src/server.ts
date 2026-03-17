@@ -35,8 +35,6 @@ export function serve () {
                 response.writeHead(501);
                 response.end(`<!DOCTYPE html><html><body><h1>HTTP 501 Not Implemented</h1><h2>Could not process this request!</h2><p>${request.method} is not supported on ${request.url}.</p></body></html>`);
         }
-
-        
     });
     server.listen(3000);
 }
