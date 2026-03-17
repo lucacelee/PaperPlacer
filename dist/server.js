@@ -15,45 +15,58 @@ const renderer = new render_1.htmlRenderer;
 const searchErgex = /\?search=(.+)/;
 function serve() {
     const server = http_1.default.createServer(async (request, response) => {
-        if ((0, static_1.loadStatic)(request, response))
-            return;
         console.log(request.method + " " + request.url);
-        if (!request.url)
-            return;
-        let urlStrings;
-        renderer.urlComponents = urlStrings = request.url.split('/');
-        const htmlName = urlStrings[1] + ".html";
-        let filepath = (0, node_path_1.join)(__dirname, "templates", htmlName);
-        if (searchErgex.test(request.url)) {
-            console.log('Someone is searching something!');
-            response.writeHead(200);
-            response.end(await renderer.renderHtml("search.html"));
-            return;
+        switch (request.method) {
+            case "GET":
+                const getRequestProcessed = await processGetRequest(request, response);
+                if (!getRequestProcessed)
+                    return;
+                break;
+            case "POST":
+                const body = [];
+                request.on('data', (chunk) => {
+                    body.push(chunk);
+                });
+                request.on('end', async () => {
+                    processPostRequest(request, response, Buffer.concat(body));
+                });
+                return;
+                break;
+            default:
+                response.writeHead(501);
+                response.end(`<!DOCTYPE html><html><body><h1>HTTP 501 Not Implemented</h1><h2>Could not process this request!</h2><p>${request.method} is not supported on ${request.url}.</p></body></html>`);
         }
-        if (!(0, fs_1.existsSync)(filepath) && request.url != '/') {
-            response.writeHead(404);
-            response.end(`<!DOCTYPE html><html><body><h1>HTTP 404 Not Found</h1><h2>Could not find the page you are looking for!</h2><p><a href="/">Back to the website</a></p></body></html>`);
-            return;
-        }
-        if (request.method == "POST") {
-            const body = [];
-            request.on('data', (chunk) => {
-                body.push(chunk);
-            });
-            request.on('end', async () => {
-                processPostRequest(request, response, body);
-            });
-            return;
-        }
-        if (request.url == "/") {
-            response.writeHead(200);
-            response.end(await renderer.renderHtml("index.html"));
-            return;
-        }
-        response.writeHead(200);
-        response.end(await renderer.renderHtml(htmlName));
     });
     server.listen(3000);
+}
+async function processGetRequest(request, response) {
+    if ((0, static_1.loadStatic)(request, response))
+        return false;
+    if (!request.url)
+        return false;
+    let urlStrings;
+    renderer.urlComponents = urlStrings = request.url.split('/');
+    const htmlName = urlStrings[1] + ".html";
+    let filepath = (0, node_path_1.join)(__dirname, "templates", htmlName);
+    if (searchErgex.test(request.url)) {
+        console.log('Someone is searching something!');
+        response.writeHead(200);
+        response.end(await renderer.renderHtml("search.html"));
+        return false;
+    }
+    if (!(0, fs_1.existsSync)(filepath) && request.url != '/') {
+        response.writeHead(404);
+        response.end(`<!DOCTYPE html><html><body><h1>HTTP 404 Not Found</h1><h2>Could not find the page you are looking for!</h2><p><a href="/">Back to the website</a></p></body></html>`);
+        return false;
+    }
+    if (request.url == "/") {
+        response.writeHead(200);
+        response.end(await renderer.renderHtml("index.html"));
+        return false;
+    }
+    response.writeHead(200);
+    response.end(await renderer.renderHtml(htmlName));
+    return true;
 }
 async function processPostRequest(request, response, body) {
     switch (request.url) {
@@ -73,7 +86,7 @@ async function processPostRequest(request, response, body) {
             }
             break;
         case '/delete':
-            const textBody = Buffer.concat(body).toString();
+            const textBody = body.toString();
             const textComponents = textBody.split('&');
             const requestComponents = Object.fromEntries(textComponents.map(component => {
                 const split = component.split('=').map((c) => {
@@ -98,8 +111,7 @@ async function processPostRequest(request, response, body) {
             response.end(`<!DOCTYPE html><html><body><h1>HTTP 501 Not Implemented</h1><h2>Could not process this POST request!</h2><p>${request.url}</p></body></html>`);
     }
 }
-async function importDownload(body) {
-    const buffer = Buffer.concat(body);
+async function importDownload(buffer) {
     const header = buffer.subarray(0, buffer.indexOf('\r\n'));
     const contentStart = buffer.indexOf('\r\n\r\n') + '\r\n\r\n'.length;
     const contentEnd = buffer.lastIndexOf(Buffer.concat([Buffer.from('\r\n'), header]));

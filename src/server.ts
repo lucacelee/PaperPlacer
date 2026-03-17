@@ -11,55 +11,68 @@ const searchErgex: RegExp = /\?search=(.+)/;
 
 export function serve () {
     const server = http.createServer(async (request: IncomingMessage, response: ServerResponse) => {
-        if (loadStatic(request, response)) return;
         console.log(request.method + " " + request.url)
+        switch (request.method) {
+            case "GET":
+                const getRequestProcessed: boolean = await processGetRequest(request, response);
+                if (!getRequestProcessed) return;
+                break;
+            case "POST":
+                const body: Buffer[] = [];
+                
+                request.on('data', (chunk: Buffer) => {
+                    body.push(chunk);
+                });
 
-        if (!request.url) return;
-
-        let urlStrings: string[];
-        renderer.urlComponents = urlStrings = request.url.split('/');
-        const htmlName: string = urlStrings[1] + ".html";
-        let filepath: string = join(__dirname, "templates", htmlName);
-
-        if (searchErgex.test(request.url)) {
-            console.log('Someone is searching something!');
-            response.writeHead(200);
-            response.end(await renderer.renderHtml("search.html"));
-            return;
+                request.on('end', async () => {
+                    processPostRequest(request, response, Buffer.concat(body));
+                });
+                return;
+                break;
+            default:
+                response.writeHead(501);
+                response.end(`<!DOCTYPE html><html><body><h1>HTTP 501 Not Implemented</h1><h2>Could not process this request!</h2><p>${request.method} is not supported on ${request.url}.</p></body></html>`);
         }
 
-        if (!existsSync(filepath) && request.url != '/') {
-            response.writeHead(404);
-            response.end(`<!DOCTYPE html><html><body><h1>HTTP 404 Not Found</h1><h2>Could not find the page you are looking for!</h2><p><a href="/">Back to the website</a></p></body></html>`);
-            return;
-        }
-
-        if (request.method == "POST") {
-            const body: Buffer[] = [];
-            
-            request.on('data', (chunk: Buffer) => {
-                body.push(chunk);
-            });
-
-            request.on('end', async () => {
-                processPostRequest(request, response, body);
-            });
-            return;
-        }
-
-        if (request.url == "/") {
-            response.writeHead(200);
-            response.end(await renderer.renderHtml("index.html"));
-            return;
-        }
         
-        response.writeHead(200);
-        response.end(await renderer.renderHtml(htmlName));
     });
     server.listen(3000);
 }
 
-async function processPostRequest(request: http.IncomingMessage, response: http.ServerResponse, body: Buffer[]) {
+async function processGetRequest(request: http.IncomingMessage, response: http.ServerResponse): Promise<boolean> {
+    if (loadStatic(request, response)) return false;
+    if (!request.url) return false;
+
+    let urlStrings: string[];
+    renderer.urlComponents = urlStrings = request.url.split('/');
+    const htmlName: string = urlStrings[1] + ".html";
+    let filepath: string = join(__dirname, "templates", htmlName);
+
+    if (searchErgex.test(request.url)) {
+        console.log('Someone is searching something!');
+        response.writeHead(200);
+        response.end(await renderer.renderHtml("search.html"));
+        return false;
+    }
+
+    if (!existsSync(filepath) && request.url != '/') {
+        response.writeHead(404);
+        response.end(`<!DOCTYPE html><html><body><h1>HTTP 404 Not Found</h1><h2>Could not find the page you are looking for!</h2><p><a href="/">Back to the website</a></p></body></html>`);
+        return false;
+    }
+
+    if (request.url == "/") {
+        response.writeHead(200);
+        response.end(await renderer.renderHtml("index.html"));
+        return false;
+    }
+    
+    response.writeHead(200);
+    response.end(await renderer.renderHtml(htmlName));
+    return true;
+}
+
+async function processPostRequest(request: http.IncomingMessage, response: http.ServerResponse, body: Buffer) {
     switch (request.url) {
         case '/upload':
             let success: boolean = false;
@@ -77,7 +90,7 @@ async function processPostRequest(request: http.IncomingMessage, response: http.
             break;
 
         case '/delete':
-            const textBody = Buffer.concat(body).toString();
+            const textBody = body.toString();
             const textComponents: Array<string> = textBody.split('&');
 
             const requestComponents: Record<string, any> = Object.fromEntries(textComponents.map(component => {
@@ -104,8 +117,7 @@ async function processPostRequest(request: http.IncomingMessage, response: http.
     }
 }
 
-async function importDownload (body: Buffer[]) {
-    const buffer: Buffer = Buffer.concat(body);
+async function importDownload (buffer: Buffer) {
     const header: Buffer = buffer.subarray(0, buffer.indexOf('\r\n'));
     const contentStart: number = buffer.indexOf('\r\n\r\n') + '\r\n\r\n'.length;
     const contentEnd: number = buffer.lastIndexOf(Buffer.concat([Buffer.from('\r\n'), header]));
