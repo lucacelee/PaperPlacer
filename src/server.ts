@@ -8,10 +8,12 @@ import { processCatalogue } from "./catalogues";
 
 const renderer: htmlRenderer = new htmlRenderer;
 const searchErgex: RegExp = /\?search=(.+)/;
+const maria = new db;
 
 export function serve () {
     const server = http.createServer(async (request: IncomingMessage, response: ServerResponse) => {
-        console.log(request.method + " " + request.url)
+        console.debug(`Received a ${request.method} request at ${request.url} from ${request.headers["user-agent"]}`);
+        if (request.headers["user-agent"]?.includes('Win')) maria.windowsModeCategoryHandling = true;
         switch (request.method) {
             case "GET":
                 const getRequestProcessed: boolean = await processGetRequest(request, response);
@@ -100,7 +102,6 @@ async function processPostRequest(request: http.IncomingMessage, response: http.
                 return [split[0], split[1]];                                // URI encoding to get the strings and turn them into
             }));                                                            // a record like {abc: "def", uvw: "xyz"}.
                                                                             // Might reuse this in the future, hence it's so general.
-            const maria = new db;
             const removed: boolean = await maria.removeCategory(requestComponents);
 
             if (removed) {
@@ -134,7 +135,6 @@ async function importDownload (buffer: Buffer) {
     if (!existsSync(tmpDir)) mkdirSync(tmpDir, {recursive: true});
     writeFileSync(downloadPath, content);
 
-    const maria = new db;
     if (downloadName.endsWith(".csv")) await maria.importFile(downloadPath);
     else if (downloadName.endsWith(".oc")) await processCatalogue(downloadPath);
     rmSync(downloadPath);

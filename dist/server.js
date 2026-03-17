@@ -13,9 +13,12 @@ const db_1 = require("./db");
 const catalogues_1 = require("./catalogues");
 const renderer = new render_1.htmlRenderer;
 const searchErgex = /\?search=(.+)/;
+const maria = new db_1.db;
 function serve() {
     const server = http_1.default.createServer(async (request, response) => {
-        console.log(request.method + " " + request.url);
+        console.debug(`Received a ${request.method} request at ${request.url} from ${request.headers["user-agent"]}`);
+        if (request.headers["user-agent"]?.includes('Win'))
+            maria.windowsModeCategoryHandling = true;
         switch (request.method) {
             case "GET":
                 const getRequestProcessed = await processGetRequest(request, response);
@@ -95,7 +98,6 @@ async function processPostRequest(request, response, body) {
                 return [split[0], split[1]]; // URI encoding to get the strings and turn them into
             })); // a record like {abc: "def", uvw: "xyz"}.
             // Might reuse this in the future, hence it's so general.
-            const maria = new db_1.db;
             const removed = await maria.removeCategory(requestComponents);
             if (removed) {
                 response.writeHead(200);
@@ -125,7 +127,6 @@ async function importDownload(buffer) {
     if (!(0, fs_1.existsSync)(tmpDir))
         (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
     (0, fs_1.writeFileSync)(downloadPath, content);
-    const maria = new db_1.db;
     if (downloadName.endsWith(".csv"))
         await maria.importFile(downloadPath);
     else if (downloadName.endsWith(".oc"))
