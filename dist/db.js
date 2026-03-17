@@ -8,6 +8,7 @@ const mariadb_1 = __importDefault(require("mariadb"));
 require("dotenv/config");
 class db {
     constructor() {
+        this.windowsModeCategoryHandling = false;
         this.dropList = [];
     }
     async setup() {
@@ -20,7 +21,7 @@ class db {
         const pathComponents = filepath.replace("/index.csv", ".csv").split('/tmp/');
         const filename = pathComponents[pathComponents.length - 1];
         let name = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
-        if (!db.windowsModeCategoryHandling) {
+        if (!this.windowsModeCategoryHandling) {
             name = name.replaceAll('\\', '/');
         }
         else {
@@ -176,7 +177,6 @@ db.pool = mariadb_1.default.createPool({
     permitLocalInfile: true,
     trace: true // Development only!
 });
-db.windowsModeCategoryHandling = false;
 db.adminPassword = process.env.PP_ADMIN_PASSWORD ?? "";
 db.requireAdminPasswordToUpload = process.env.PP_REQUIRE_ADMIN_PASSWORD_TO_UPLOAD_FILES == "true";
 //# sourceMappingURL=db.js.map
