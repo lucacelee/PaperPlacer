@@ -3,19 +3,22 @@ import fs from "fs";
 import { db } from "./db";
 
 export class htmlRenderer{
-    templatesPath: string = path.join(__dirname, "templates");
-    formatErgex: RegExp = /<\!--%(?<command>\w+)="(?<argument>.+?)"%-->/g;
-    insertErgex: RegExp = /\{\{(\d)\}\}/g;
-    searchErgex: RegExp = /\?search=(.+)/;
-    urlComponents: string[] = [];
+    private templatesPath: string = path.join(__dirname, "templates");
+    private formatErgex: RegExp = /<\!--%(?<command>\w+)="(?<argument>.+?)"%-->/g;
+    private insertErgex: RegExp = /\{\{(\d)\}\}/g;
+    private searchErgex: RegExp = /\?search=(.+)/;
+    public urlComponents: string[] = [];
     static recursionCycles: number = 0;
 
     private substitutionPending: boolean = false;
     private substitutionArguments: string[] = [];
-    searchPrompt: string = '';
-    searchTable: string = '';
-    searchUrl: string = '';
-    insertTable: string = '';
+    
+    private searchPrompt: string = '';
+    private searchTable: string = '';
+    private  searchUrl: string = '';
+    private insertTable: string = '';
+    
+    public userEnvironment: string = '';
 
     public async renderHtml (page: string) {
         let html = fs.readFileSync(path.join(this.templatesPath, page), 'utf8');

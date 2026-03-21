@@ -20,6 +20,7 @@ class htmlRenderer {
         this.searchTable = '';
         this.searchUrl = '';
         this.insertTable = '';
+        this.userEnvironment = '';
     }
     async renderHtml(page) {
         let html = fs_1.default.readFileSync(node_path_1.default.join(this.templatesPath, page), 'utf8');
