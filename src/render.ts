@@ -43,6 +43,7 @@ export class htmlRenderer{
                 () => {
                     return a.replaceAll("[[url]]", this.searchTable)
                             .replaceAll("[[query]]", this.searchPrompt)
+                            .replaceAll("[[environment]]", this.userEnvironment)
                             .replaceAll("[[table]]", this.insertTable);
                 });
             }

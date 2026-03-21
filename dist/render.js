@@ -44,6 +44,7 @@ class htmlRenderer {
                 html = html.replace(`<--!%substitute="${a}"%-->`, () => {
                     return a.replaceAll("[[url]]", this.searchTable)
                         .replaceAll("[[query]]", this.searchPrompt)
+                        .replaceAll("[[environment]]", this.userEnvironment)
                         .replaceAll("[[table]]", this.insertTable);
                 });
             }
