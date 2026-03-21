@@ -17,8 +17,9 @@ const maria = new db_1.db;
 function serve() {
     const server = http_1.default.createServer(async (request, response) => {
         console.debug(`Received a ${request.method} request at ${request.url} from ${request.headers["user-agent"]}`);
-        if (request.headers["user-agent"]?.includes('Win'))
-            maria.windowsModeCategoryHandling = true;
+        const windowsUser = request.headers["user-agent"]?.includes('Win');
+        maria.windowsModeCategoryHandling = windowsUser ?? false;
+        renderer.userEnvironment = (windowsUser) ? 'windows' : 'unix';
         switch (request.method) {
             case "GET":
                 const getRequestProcessed = await processGetRequest(request, response);
