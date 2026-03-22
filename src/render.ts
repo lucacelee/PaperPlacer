@@ -28,15 +28,7 @@ export class htmlRenderer{
 
     private async loopRegex (html: string): Promise<string> {
         htmlRenderer.recursionCycles++;
-        const match = html.matchAll(this.formatErgex);
-        for (const m of match) {
-            const command:string | undefined = m.groups?.command;
-            const argument:string | undefined = m.groups?.argument;
-            if (command == null || argument == null) break;
-            const thestring:string = m[0];
-            html = html.replace(thestring, await this.processTags(command, argument))
-            htmlRenderer.recursionCycles = 0;
-        }
+        html = await this.findTagsIn(html);
         if (this.substitutionPending) {
             for (let a of this.substitutionArguments) {
                 html = html.replace(`<--!%substitute="${a}"%-->`,
@@ -47,6 +39,20 @@ export class htmlRenderer{
                             .replaceAll("[[table]]", this.insertTable);
                 });
             }
+            html = await this.findTagsIn(html);
+        }
+        return html;
+    }
+
+    private async findTagsIn (html: string): Promise<string> {
+        const match = html.matchAll(this.formatErgex);
+        for (const m of match) {
+            const command:string | undefined = m.groups?.command;
+            const argument:string | undefined = m.groups?.argument;
+            if (command == null || argument == null) break;
+            const thestring:string = m[0];
+            html = html.replace(thestring, await this.processTags(command, argument))
+            htmlRenderer.recursionCycles = 0;
         }
         return html;
     }
