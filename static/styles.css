@@ -7,9 +7,9 @@ body {
 }
 
 main {
-    padding-top: 2rem;
+    padding-top: 1rem;
     margin: auto;
-    max-width: 1000px;
+    max-width: 64rem;
     border: 3px white;
     color: brown;
 }
@@ -19,13 +19,13 @@ header {
     display: flex;
     flex-direction: row;
     margin: auto;
-    max-width: 1000px;
+    max-width: 62rem;
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(1rem);
     border: 0.1rem solid rgba(255, 255, 255, 0.3);
-    border-radius: 2rem;
+    border-radius: 1.5rem;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 header > #upload_button {
@@ -184,7 +184,7 @@ button:hover {
     margin: 0.2em;
 }
 
-.search_query samp {
+samp {
     background-color: seashell;
   border-radius: 3px;
   border: 1px solid darkgoldenrod;
