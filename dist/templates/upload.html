@@ -15,6 +15,35 @@
                     <input type="submit" value="Upload">
                 </form>
                 <!--%include="admin.html"%-->
+                <h1>Uploading a catalogue</h1>
+                <p>In order to upload a catalogue, you first need to create a catalogue. A catalogue consists of categories, and each category must be sent as a <samp>CSV</samp> file.</p>
+                <p>To create a <samp>CSV</samp>, you need to open your spreadsheet processor of choice <i>(i.e. Microsoft Excel, LibreOffice Calc, Apple Numbers, etc.)</i> and create a table with four columns: <b>Name</b>, <b>MIME</b>, <b>Link</b> and <b>Transcript</b>.</p>
+                <img src="/table.png" width="100%"/>
+                <ol>
+                    <li>
+                        <b>Name</b> is the name you want to give the entry, it can be anything.
+                    </li>
+                    <li>
+                        <b>Mime</b> is the <a href="https://en.wikipedia.org/wiki/Media_type">media type</a> of the file. It tells the program what type of file it is. You can find a complete list of them <a href="https://mime.wcode.net/">here</a>.
+                    </li>
+                    <li>
+                        <b>Link</b> is the URL to the file itself. Most of the time, it will begin with <code>https://</code>
+                    </li>
+                    <li>
+                        <b>Transcript</b> is the transcription of the file. This field isn't mandatory, since images don't necessarily have text, but PDF or DOCX files do. This is used for searching the files.
+                    </li>
+                </ol>
+                <p>When saving the file, make sure you save as <code>CSV</code> and select field spacing with <b>tabulation</b> in the saving settings.</p>
+                <div class="flex" style="height: fit-content;">
+                    <div>
+                        <p>If you want to send multiple files together <i>as a tree</i> (i.e. have categories inside of categories), you can send them as a <code>zip archive</code>. Your root file must be called <code>index.csv</code>. There, you can link to other categories, by putting their <b>filename</b> in the <i>Link</i> column and listing <i>Mime</i> as <code>category</code>. You can also create folders with files in them. The root <code>CSV</code> in each folder also has to be called <code>index.csv</code>. When linking to a folder, put the folder's name in <i>Link</i>.</p>
+                        <p>When saving a zip file, change the file extension to <code>.oc</code> and upload it to this page.</p>
+                    </div>
+                    <img src="/PaperPlacer Catalogue Structure.svg" max-height="300px" style="margin-left: 1rem; margin-top: -1rem;"/>
+                </div>
+                <p>The filename will become the name of the category. By default, the catalogue will appear in the sidebar. You can also make it appear as a sub-category inside of an already existing catalogue.
+                <!--%substitute="<!--%include="[[environment]]_upload_instructions.html"%-->"%-->
+                </p>
             </div>
         </div>
     </main>
