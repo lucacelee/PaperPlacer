@@ -8,7 +8,6 @@ const mariadb_1 = __importDefault(require("mariadb"));
 require("dotenv/config");
 class db {
     constructor() {
-        this.windowsModeCategoryHandling = false;
         this.dropList = [];
     }
     async setup() {
@@ -21,12 +20,14 @@ class db {
         const pathComponents = filepath.replace("/index.csv", ".csv").split('/tmp/');
         const filename = pathComponents[pathComponents.length - 1];
         let name = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
-        if (!this.windowsModeCategoryHandling) {
-            name = name.replaceAll('\\', '/');
-        }
-        else {
-            name = name.replaceAll(' in ', '/');
-        }
+        name = name.replaceAll(" '''-'-''' ", '/')
+            .replaceAll("'''-DOUBLEQUOTE-'''", '"')
+            .replaceAll("'''-LESSTHAN-'''", "<")
+            .replaceAll("'''-MORETHAN-'''", ">")
+            .replaceAll("'''-QUESTIONMARK-'''", "?")
+            .replaceAll("'''-COLON-'''", ":")
+            .replaceAll("'''-ASTERISK-'''", "*")
+            .replaceAll("'''-VERTICALBAR-'''", "|");
         console.log(`The file name is ${name}`);
         try {
             await conn.beginTransaction();

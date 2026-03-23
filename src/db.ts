@@ -11,7 +11,6 @@ export class db {
       trace: true     // Development only!
     });
 
-    public windowsModeCategoryHandling: boolean = false;
     private static adminPassword: string = process.env.PP_ADMIN_PASSWORD ?? "";
     public static requireAdminPasswordToUpload: boolean = process.env.PP_REQUIRE_ADMIN_PASSWORD_TO_UPLOAD_FILES == "true";
 
@@ -28,11 +27,14 @@ export class db {
         const pathComponents:string[] = filepath.replace("/index.csv", ".csv").split('/tmp/');
         const filename:string = pathComponents[pathComponents.length-1];
         let name: string = filename.endsWith(".csv") ? filename.replace(".csv", "") : "";
-        if (!this.windowsModeCategoryHandling) {
-            name = name.replaceAll('\\', '/');
-        } else {
-            name = name.replaceAll(' in ', '/');
-        }
+        name = name.replaceAll(" '''-'-''' ", '/')
+                   .replaceAll("'''-DOUBLEQUOTE-'''", '"')
+                   .replaceAll("'''-LESSTHAN-'''", "<")
+                   .replaceAll("'''-MORETHAN-'''", ">")
+                   .replaceAll("'''-QUESTIONMARK-'''", "?")
+                   .replaceAll("'''-COLON-'''", ":")
+                   .replaceAll("'''-ASTERISK-'''", "*")
+                   .replaceAll("'''-VERTICALBAR-'''", "|");
         console.log(`The file name is ${name}`);
         try {
             await conn.beginTransaction();

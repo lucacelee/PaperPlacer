@@ -10,11 +10,12 @@ const renderer: htmlRenderer = new htmlRenderer;
 const searchErgex: RegExp = /\?search=(.+)/;
 const maria = new db;
 
+var windowsUser: boolean;
+
 export function serve () {
     const server = http.createServer(async (request: IncomingMessage, response: ServerResponse) => {
         console.debug(`Received a ${request.method} request at ${request.url} from ${request.headers["user-agent"]}`);
-        const windowsUser: boolean | undefined = request.headers["user-agent"]?.includes('Win');
-        maria.windowsModeCategoryHandling = windowsUser ?? false;
+        windowsUser = request.headers["user-agent"]?.includes('Windows NT') ?? false;
         renderer.userEnvironment = (windowsUser) ? 'windows' : 'unix';
         switch (request.method) {
             case "GET":
@@ -128,7 +129,17 @@ async function importDownload (buffer: Buffer) {
 
     const filenameRegex: RegExp = /filename="(.+?)"/;
     const bufferFilename = metadata.toString("utf-8").match(filenameRegex);
-    const downloadName = (bufferFilename == null) ? "unnamed" : bufferFilename[1];
+    const downloadName = ((bufferFilename == null) ? "unnamed" : bufferFilename[1])
+                            .replaceAll(" '''-'-''' ", " '''--''' ")
+                            .replaceAll('"', "'''-DOUBLEQUOTE-'''")
+                            .replaceAll("<", "'''-LESSTHAN-'''")
+                            .replaceAll(">", "'''-MORETHAN-'''")                // Windows-safe filenames used internally
+                            .replaceAll("?", "'''-QUESTIONMARK-'''")
+                            .replaceAll(":", "'''-COLON-'''")                   // This replaces all Windows-invalid characters
+                            .replaceAll("*", "'''-ASTERISK-'''")                // with a replacement string. Other characters are
+                            .replaceAll("|", "'''-VERTICALBAR-'''")             // already handled:
+                            .replaceAll(((windowsUser) ? ' -into- ' : '\\'),    // - Forward slashes are forbidden even on UNIX systems
+                             " '''-'-''' ");                                    // - Backslashes are used on UNIX systems for categories
     
     const tmpDir = join(__dirname, "../tmp");
     const downloadPath = join(tmpDir, downloadName).replace(".oc", ".zip");
