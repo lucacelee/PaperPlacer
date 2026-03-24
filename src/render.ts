@@ -103,9 +103,9 @@ export class htmlRenderer{
     private async insertFromDatabase(argparts: string[]): Promise<string> {
         const maria = new db;
         const insertArgs: string[] = argparts[2].split("=>");
-        let tempHtml: string = "";
-        let table: string = (insertArgs[0] === '[[url]]') ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
+        const table: string = (insertArgs[0] === '[[url]]') ? decodeURIComponent(this.urlComponents.slice(2, this.urlComponents.length).join('/')) : insertArgs[0];
         this.insertTable = table;
+        let tempHtml: string = "";
         
         if (!await maria.tableExists(table)) {
             throw new ReferenceError(`The specified table '${table}' doesn't exist!`);
@@ -117,8 +117,7 @@ export class htmlRenderer{
         } else {
             columns = await maria.getTableContents(table, insertArgs[1].split(','));
         }
-        let text: string = argparts[0];
-
+        
         tempHtml += this.setMimeThumbnails(columns, argparts);
         return tempHtml;
     }
