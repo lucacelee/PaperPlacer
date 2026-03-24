@@ -11,6 +11,7 @@ const render_1 = require("./render");
 const static_1 = require("./static");
 const db_1 = require("./db");
 const catalogues_1 = require("./catalogues");
+require("dotenv/config");
 const renderer = new render_1.htmlRenderer;
 const searchErgex = /\?search=(.+)/;
 const maria = new db_1.db;
@@ -41,7 +42,14 @@ function serve() {
                 response.end(`<!DOCTYPE html><html><body><h1>HTTP 501 Not Implemented</h1><h2>Could not process this request!</h2><p>${request.method} is not supported on ${request.url}.</p></body></html>`);
         }
     });
-    server.listen(3000);
+    try {
+        const port = parseInt(process.env.PP_WEBSERVER_PORT ?? '3000');
+        server.listen(port);
+        console.log(`PaperPlacer available on port ${port}`);
+    }
+    catch (error) {
+        console.error(`Couldn't start the web server.\n${error.message}\nPort specified: ${process.env.PP_WEBSERVER_PORT ?? 'Unspecified'}`);
+    }
 }
 async function processGetRequest(request, response) {
     if ((0, static_1.loadStatic)(request, response))

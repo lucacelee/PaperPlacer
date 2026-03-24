@@ -5,6 +5,7 @@ import { htmlRenderer } from "./render";
 import { loadStatic } from "./static";
 import { db } from "./db";
 import { processCatalogue } from "./catalogues";
+import 'dotenv/config';
 
 const renderer: htmlRenderer = new htmlRenderer;
 const searchErgex: RegExp = /\?search=(.+)/;
@@ -39,7 +40,13 @@ export function serve () {
                 response.end(`<!DOCTYPE html><html><body><h1>HTTP 501 Not Implemented</h1><h2>Could not process this request!</h2><p>${request.method} is not supported on ${request.url}.</p></body></html>`);
         }
     });
-    server.listen(3000);
+    try {
+        const port = parseInt(process.env.PP_WEBSERVER_PORT ?? '3000');
+        server.listen(port);
+        console.log(`PaperPlacer available on port ${port}`);
+    } catch (error: any) {
+        console.error(`Couldn't start the web server.\n${error.message}\nPort specified: ${process.env.PP_WEBSERVER_PORT ?? 'Unspecified'}`);
+    }
 }
 
 async function processGetRequest(request: http.IncomingMessage, response: http.ServerResponse): Promise<boolean> {
